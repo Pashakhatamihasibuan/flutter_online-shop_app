@@ -1,0 +1,2 @@
+/Users/pashakhatamihasibuan/Downloads/flutter_onlineshop_app/android/app/.cxx/Debug/2z3q382m/x86_64/CMakeFiles/edit_cache.dir
+/Users/pashakhatamihasibuan/Downloads/flutter_onlineshop_app/android/app/.cxx/Debug/2z3q382m/x86_64/CMakeFiles/rebuild_cache.dir
