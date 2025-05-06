@@ -11,8 +11,8 @@ class SplashPage extends StatelessWidget {
     Future.delayed(
       const Duration(seconds: 3),
       () => context.goNamed(
-        RouteConstants.login,
-        // pathParameters: PathParameters().toMap(),
+        RouteConstants.root,
+        pathParameters: {'root_tab': '0'}, // default tab index
       ),
     );
 

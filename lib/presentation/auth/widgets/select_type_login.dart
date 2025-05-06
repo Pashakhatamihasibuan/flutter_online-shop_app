@@ -48,7 +48,7 @@ class SelectTypeLogin extends StatelessWidget {
                 ),
                 child: const Center(
                   child: Text(
-                    'Phone Number',
+                    'Nomor Telepon',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                     ),

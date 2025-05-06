@@ -21,7 +21,7 @@ class CategoryButton extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Image.asset(
+            Image.network(
               imagePath,
               width: 80.0,
               height: 80.0,

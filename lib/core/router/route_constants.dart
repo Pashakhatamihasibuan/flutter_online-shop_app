@@ -1,67 +1,71 @@
 part of 'app_router.dart';
 
 class RouteConstants {
-  /// route for page [SplashPage]
+  /// Splash Page
   static const String splash = 'splash';
   static const String splashPath = '/splash';
 
-  /// route for page [LoginPage]
+  /// Login Page
   static const String login = 'login';
   static const String loginPath = '/login';
 
-  /// route for page [RegisterPage]
+  /// Register Page
   static const String register = 'register';
   static const String registerPath = 'register';
 
-  /// route for page [VerificationPage]
-  static const String verification = 'verification';
-  static const String verificationPath = 'verification';
-
-  /// route for page [DashboardPage]
+  /// Dashboard / Root Page
   static const String root = 'root';
   static const String rootPath = '/:root_tab';
 
-  /// route for page [ProductDetailPage]
+  /// All Categories Page
+  static const String allCategories = 'all_categories';
+  static const String allCategoriesPath = 'categories';
+
+  /// Products by Category Page
+  static const String productsByCategory = 'products_by_category';
+  static const String productsByCategoryPath = 'products-by-category/:id';
+
+  /// Product Detail Page
   static const String productDetail = 'product_detail';
   static const String productDetailPath = 'product_detail';
 
-  /// route for page [CartPage]
+  /// Cart Page
   static const String cart = 'cart';
   static const String cartPath = 'cart';
 
-  /// route for page [AddressPage]
+  /// Address Page
   static const String address = 'address';
   static const String addressPath = 'address';
 
-  /// route for page [AddAddressPage]
-  static const String addAddress = 'add-address';
-  static const String addAddressPath = 'add-address';
+  /// Add Address Page
+  static const String addAddress = 'add_address';
+  static const String addAddressPath = 'address/add';
 
-  /// route for page [EditAddressPage]
-  static const String editAddress = 'edit-address';
-  static const String editAddressPath = 'edit-address';
+  /// Edit Address Page
+  static const String editAddress = 'edit_address';
+  static const String editAddressPath = 'address/edit';
 
-  /// route for page [OrderDetailPage]
+  /// Order Detail Page
   static const String orderDetail = 'order_detail';
   static const String orderDetailPath = 'order_detail';
 
-  /// route for page [PaymentDetailPage]
+  /// Payment Detail Page
   static const String paymentDetail = 'payment_detail';
   static const String paymentDetailPath = 'payment_detail';
 
-  /// route for page [TrackingOrderPage]
+  /// Tracking Order Page
   static const String trackingOrder = 'tracking_order';
   static const String trackingOrderPath = 'tracking_order';
 
-  /// route for page [ShippingDetailPage]
+  /// Shipping Detail Page
   static const String shippingDetail = 'shipping_detail';
   static const String shippingDetailPath = 'shipping_detail';
 
-  /// route for page [PaymentWaitingPage]
+  /// Payment Waiting Page
   static const String paymentWaiting = 'payment_waiting';
   static const String paymentWaitingPath = 'payment_waiting';
 
-  /// route for page [OrderPage]
+  /// Order List Page
   static const String orderList = 'order_list';
   static const String orderListPath = 'order_list';
 }

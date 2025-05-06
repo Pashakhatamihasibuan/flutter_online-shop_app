@@ -66,7 +66,7 @@ class TrackingHorizontal extends StatelessWidget {
           Button.outlined(
             disabled: trackRecord.status == TrackRecordStatus.dikirim,
             onPressed: () {},
-            label: 'Cancel order',
+            label: 'Cancel Pesanan',
           ),
         ],
         if (trackRecord.status == TrackRecordStatus.selesai) ...[

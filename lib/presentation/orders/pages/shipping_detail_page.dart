@@ -17,12 +17,12 @@ class ShippingDetailPage extends StatelessWidget {
     final List<ProductModel> orders = [
       ProductModel(
         images: [
-          Assets.images.products.earphone.path,
-          Assets.images.products.earphone.path,
-          Assets.images.products.earphone.path,
+          Assets.images.products.correctionpen.path,
+          Assets.images.products.correctionpen.path,
+          Assets.images.products.correctionpen.path,
         ],
-        name: 'Earphone',
-        price: 320000,
+        name: 'Correction Pen',
+        price: 4950,
         stock: 20,
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ',

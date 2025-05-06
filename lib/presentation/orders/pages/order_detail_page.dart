@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../../core/components/buttons.dart';
 import '../../../core/components/spaces.dart';
 import '../../../core/core.dart';
@@ -20,12 +19,12 @@ class OrderDetailPage extends StatelessWidget {
     final List<ProductModel> carts = [
       ProductModel(
         images: [
-          Assets.images.products.earphone.path,
-          Assets.images.products.earphone.path,
-          Assets.images.products.earphone.path,
+          Assets.images.products.correctionpen.path,
+          Assets.images.products.correctionpen.path,
+          Assets.images.products.correctionpen.path,
         ],
-        name: 'Earphone',
-        price: 320000,
+        name: 'Correction Pen',
+        price: 4950,
         stock: 20,
         description:
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ',
@@ -74,18 +73,15 @@ class OrderDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20.0),
         children: [
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: carts.length,
-            itemBuilder: (context, index) => CartTile(
-              data: CartModel(
-                product: carts[index],
-                quantity: 1,
-              ),
-            ),
-            separatorBuilder: (context, index) => const SpaceHeight(16.0),
-          ),
+          // ListView.separated(
+          //   shrinkWrap: true,
+          //   physics: const NeverScrollableScrollPhysics(),
+          //   itemCount: carts.length,
+          //   // itemBuilder: (context, index) => CartTile(
+          //   //   data: checkout[index]
+          //   // ),
+          //   separatorBuilder: (context, index) => const SpaceHeight(16.0),
+          // ),
           const SpaceHeight(36.0),
           const _SelectShipping(),
           // const _ShippingSelected(),

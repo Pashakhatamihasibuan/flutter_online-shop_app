@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:flutter_onlineshop_app/data/models/responses/product_response_model.dart';
+import 'package:flutter_onlineshop_app/data/models/responses/category_response_model.dart';
 import '../../../../core/components/spaces.dart';
-import '../../models/product_model.dart';
 import '../product_card.dart';
 import '../title_content.dart';
 
 class ProductList extends StatelessWidget {
   final String title;
-  final VoidCallback onSeeAllTap;
-  final List<ProductModel> items;
+  final List<Product> items;
+  final List<Category> categories;
 
   const ProductList({
-    super.key,
+    Key? key,
     required this.title,
-    required this.onSeeAllTap,
     required this.items,
-  });
+    required this.categories,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class ProductList extends StatelessWidget {
       children: [
         TitleContent(
           title: title,
-          onSeeAllTap: onSeeAllTap,
+          categories: categories,
         ),
         const SpaceHeight(20.0),
         GridView.builder(
@@ -35,12 +34,11 @@ class ProductList extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 10.0,
             mainAxisSpacing: 55.0,
+            childAspectRatio: 0.7,
           ),
           itemCount: items.length,
-          itemBuilder: (context, index) => ProductCard(
-            data: items[index],
-          ),
-        )
+          itemBuilder: (context, index) => ProductCard(data: items[index]),
+        ),
       ],
     );
   }

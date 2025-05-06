@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../../core/components/buttons.dart';
 import '../../../core/components/spaces.dart';
 import '../../../core/core.dart';
@@ -176,7 +175,7 @@ class PaymentWaitingPage extends StatelessWidget {
                   });
                 },
                 label: 'Copy',
-                icon: Assets.icons.copy.svg(),
+                // icon: Assets.icons.copy.svg(),
               ),
             ],
           ),

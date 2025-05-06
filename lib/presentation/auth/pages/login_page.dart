@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_onlineshop_app/data/datasources/auth_local_datasource.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/components/buttons.dart';
 import '../../../core/components/spaces.dart';
 import '../../../core/core.dart';
 import '../../../core/router/app_router.dart';
-import '../models/country_model.dart';
-import '../widgets/select_type_login.dart';
+import '../bloc/login/login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,41 +16,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TypeLoginIs typeLogin = TypeLoginIs.phoneNumber;
-  final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final countries = [
-    CountryModel(
-      name: 'Indonesia',
-      flag:
-          'https://upload.wikimedia.org/wikipedia/commons/0/0b/Flag_of_Indonesia.png',
-      phoneCode: 62,
-    ),
-    CountryModel(
-      name: 'Spanish',
-      flag:
-          'https://w7.pngwing.com/pngs/124/420/png-transparent-flag-of-spain-spanish-language-education-english-translation-spain-flag-miscellaneous-flag-text.png',
-      phoneCode: 34,
-    ),
-    CountryModel(
-      name: 'English',
-      flag:
-          'https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Great_Britain_%28English_version%29.png',
-      phoneCode: 44,
-    ),
-  ];
-  late CountryModel selectedCountry;
-
-  @override
-  void initState() {
-    selectedCountry = countries.first;
-    super.initState();
-  }
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
-    phoneController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -63,122 +34,106 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 40.0),
         children: [
           const Text(
-            'Login Account',
+            'Masuk Akun',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           const Text(
-            'Hello, welcome back to our account',
+            'Halo, selamat datang kembali di akun kami',
             style: TextStyle(
               fontWeight: FontWeight.w600,
             ),
           ),
+          const SpaceHeight(60.0),
+
+          // Email
+          TextFormField(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              labelText: 'Email ID',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Assets.icons.email.svg(),
+              ),
+            ),
+          ),
+          const SpaceHeight(20.0),
+
+          // Password dengan eye icon
+          TextFormField(
+            controller: passwordController,
+            obscureText: !_isPasswordVisible,
+            decoration: InputDecoration(
+              labelText: 'Kata Sandi',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Assets.icons.password.svg(),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              ),
+            ),
+          ),
           const SpaceHeight(50.0),
-          SelectTypeLogin(
-            typeLoginIs: typeLogin,
-            onChanged: (value) {
-              typeLogin = value;
-              setState(() {});
+
+          // BlocConsumer
+          BlocConsumer<LoginBloc, LoginState>(
+            listener: (context, state) {
+              switch (state) {
+                case LoginLoded(:final authResponseModel):
+                  AuthLocalDatasource().saveAuthData(authResponseModel);
+                  context.goNamed(
+                    RouteConstants.root,
+                    pathParameters: PathParameters().toMap(),
+                  );
+                  break;
+
+                case LoginError(:final message):
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(message),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  break;
+              }
+            },
+            builder: (context, state) {
+              switch (state) {
+                case LoginLoading():
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+
+                default:
+                  return Button.filled(
+                    onPressed: () {
+                      context.read<LoginBloc>().add(
+                            LoginEvent.login(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            ),
+                          );
+                    },
+                    label: 'Masuk',
+                  );
+              }
             },
           ),
-          if (typeLogin.isPhoneNumber) ...[
-            const SpaceHeight(80.0),
-            TextFormField(
-              controller: phoneController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                prefixIcon: DropdownButton<CountryModel>(
-                  value: selectedCountry,
-                  items: countries.map<DropdownMenuItem<CountryModel>>(
-                      (CountryModel country) {
-                    return DropdownMenuItem<CountryModel>(
-                      value: country,
-                      child: Row(
-                        children: [
-                          Image.network(
-                            country.flag,
-                            width: 24.0,
-                            height: 24.0,
-                            fit: BoxFit.contain,
-                          ),
-                          const SpaceWidth(10.0),
-                          Text('+${country.phoneCode}'),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      final selected = value ?? selectedCountry;
-                      selectedCountry = selected;
-                    });
-                  },
-                ),
-              ),
-            ),
-            const SpaceHeight(50.0),
-            Button.filled(
-              onPressed: () {
-                context.goNamed(RouteConstants.verification);
-              },
-              label: 'Minta OTP',
-            ),
-          ] else if (typeLogin.isEmail) ...[
-            const SpaceHeight(60.0),
-            TextFormField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email ID',
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Assets.icons.email.svg(),
-                ),
-              ),
-            ),
-            const SpaceHeight(20.0),
-            TextFormField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Assets.icons.password.svg(),
-                ),
-              ),
-            ),
-            const SpaceHeight(50.0),
-            Button.filled(
-              onPressed: () {
-                context.goNamed(
-                  RouteConstants.root,
-                  pathParameters: PathParameters().toMap(),
-                );
-              },
-              label: 'Login',
-            ),
-          ],
+
           const SpaceHeight(50.0),
-          const Row(
-            children: [
-              Flexible(child: Divider()),
-              SizedBox(width: 14.0),
-              Text('OR'),
-              SizedBox(width: 14.0),
-              Flexible(child: Divider()),
-            ],
-          ),
-          const SpaceHeight(50.0),
-          Button.outlined(
-            onPressed: () {},
-            label: 'Login with Google',
-            icon: Assets.images.google.image(height: 20.0),
-          ),
-          const SpaceHeight(50.0),
+
+          // Link ke register
           InkWell(
             onTap: () {
               context.goNamed(RouteConstants.register);
@@ -187,13 +142,13 @@ class _LoginPageState extends State<LoginPage> {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Not Registered yet? ',
+                    text: 'Belum Terdaftar? ',
                     style: TextStyle(
                       color: AppColors.primary,
                     ),
                   ),
                   TextSpan(
-                    text: 'Create an Account',
+                    text: 'Buat Akun',
                     style: TextStyle(
                       color: AppColors.grey,
                       fontWeight: FontWeight.w600,

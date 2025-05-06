@@ -23,12 +23,7 @@ class _DashboardPageState extends State<DashboardPage> {
     const HomePage(),
     // const SearchPage(),
     const CartPage(),
-    // const Center(
-    //   child: Text('This Page 1'),
-    // ),
-    // const Center(
-    //   child: Text('This Page 2'),
-    // ),
+
     const Center(
       child: Text('This Page 3'),
     ),
@@ -64,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             activeIcon: Assets.icons.home.svg(),
-            label: 'HOME',
+            label: 'BERANDA',
           ),
           BottomNavigationBarItem(
             icon: Assets.icons.order.svg(
@@ -74,7 +69,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             activeIcon: Assets.icons.order.svg(),
-            label: 'ORDER',
+            label: 'PESANAN',
           ),
           BottomNavigationBarItem(
             icon: Assets.icons.search.svg(
@@ -84,7 +79,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             activeIcon: Assets.icons.search.svg(),
-            label: 'EXPLORE',
+            label: 'JELAJAHI',
           ),
           BottomNavigationBarItem(
             icon: Assets.icons.person.svg(
@@ -94,7 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             activeIcon: Assets.icons.person.svg(),
-            label: 'ACCOUNT',
+            label: 'AKUN',
           ),
         ],
       ),
