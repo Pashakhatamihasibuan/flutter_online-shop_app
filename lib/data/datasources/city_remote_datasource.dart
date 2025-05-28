@@ -5,8 +5,7 @@ import '../../../data/models/responses/city_response_model.dart';
 class CityRemoteDatasource {
   Future<Either<String, CityResponseModel>> getCities(
       String provinceCode) async {
-    final url =
-        Uri.parse('https://wilayah.id/api/regencies/$provinceCode.json');
+    final url = Uri.parse('https://api.rajaongkir.com/starter/city');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

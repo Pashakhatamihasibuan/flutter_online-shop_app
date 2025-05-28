@@ -14,7 +14,7 @@ class MewarnaiBloc extends Bloc<MewarnaiEvent, MewarnaiState> {
     on<MewarnaiEvent>((event, emit) async {
       emit(const MewarnaiLoading());
 
-      final response = await productRemoteDatasource.getProductByCategory(12);
+      final response = await productRemoteDatasource.getProductByCategory(6);
       response.fold(
         (failure) => emit(const MewarnaiError('Internal Server Error')),
         (productResponse) =>

@@ -25,7 +25,7 @@ class _AddressPageState extends State<AddressPage> {
   @override
   void initState() {
     super.initState();
-    context.read<AddressBloc>().add(const AddressEvent.getAddress());
+    context.read<AddressBloc>().add(const AddressEvent.getAddresses());
   }
 
   @override
@@ -65,6 +65,13 @@ class _AddressPageState extends State<AddressPage> {
               final defaultIndex =
                   addresses.indexWhere((e) => e.isDefault == 1);
               selectedIndex = defaultIndex != -1 ? defaultIndex : 0;
+
+              // Simpan address_id default ke CheckoutBloc
+              if (selectedIndex != null) {
+                context.read<CheckoutBloc>().add(
+                      CheckoutEvent.addAddressId(addresses[selectedIndex!].id!),
+                    );
+              }
             }
 
             return ListView(
@@ -75,10 +82,8 @@ class _AddressPageState extends State<AddressPage> {
                   style: TextStyle(fontSize: 16),
                 ),
                 const SpaceHeight(20.0),
-
                 if (addresses.isEmpty)
                   const Text("Belum ada alamat, silakan tambahkan."),
-
                 if (addresses.isNotEmpty)
                   ListView.separated(
                     shrinkWrap: true,
@@ -91,27 +96,26 @@ class _AddressPageState extends State<AddressPage> {
                         setState(() {
                           selectedIndex = index;
                         });
+
+                        // Simpan address_id ke CheckoutBloc
+                        context.read<CheckoutBloc>().add(
+                              CheckoutEvent.addAddressId(addresses[index].id!),
+                            );
                       },
                       onEditTap: () {
                         context.goNamed(
                           RouteConstants.editAddress,
                           pathParameters: {
                             ...PathParameters(rootTab: RootTab.order).toMap(),
-                            'id': addresses[index]
-                                .id
-                                .toString(), // Tambahkan ID sebagai path parameter
+                            'id': addresses[index].id.toString(),
                           },
-                          extra: addresses[
-                              index], // Tetap kirim modelnya jika diperlukan
+                          extra: addresses[index],
                         );
                       },
                     ),
                     separatorBuilder: (_, __) => const SpaceHeight(16.0),
                   ),
-
                 const SpaceHeight(40.0),
-
-                // ✅ Tombol Tambah Alamat tetap ada
                 Button.outlined(
                   onPressed: () {
                     context.goNamed(
@@ -123,13 +127,12 @@ class _AddressPageState extends State<AddressPage> {
                   },
                   label: 'Add address',
                 ),
-
                 const SpaceHeight(50.0),
               ],
             );
           }
 
-          return const SizedBox(); // Untuk AddressInitial
+          return const SizedBox();
         },
       ),
       bottomNavigationBar: Padding(
@@ -159,12 +162,15 @@ class _AddressPageState extends State<AddressPage> {
                   const SpaceHeight(12.0),
                   Button.filled(
                     onPressed: () {
-                      context.goNamed(
-                        RouteConstants.orderDetail,
-                        pathParameters: PathParameters(
-                          rootTab: RootTab.order,
-                        ).toMap(),
-                      );
+                      if (selectedIndex != null) {
+                        // Lanjut ke halaman shipping/order detail
+                        context.goNamed(
+                          RouteConstants.orderDetail,
+                          pathParameters: PathParameters(
+                            rootTab: RootTab.order,
+                          ).toMap(),
+                        );
+                      }
                     },
                     label: 'Lanjutkan',
                   ),

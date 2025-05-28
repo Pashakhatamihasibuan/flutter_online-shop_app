@@ -15,7 +15,14 @@ class ProductsByCategoryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(category.name ?? 'Produk'),
       ),
-      body: BlocBuilder<ProductBloc, ProductState>(
+      body: BlocConsumer<ProductBloc, ProductState>(
+        listener: (context, state) {
+          if (state is ProductError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
         builder: (context, state) {
           if (state is ProductLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -41,10 +48,8 @@ class ProductsByCategoryPage extends StatelessWidget {
                 },
               ),
             );
-          } else if (state is ProductError) {
-            return Center(child: Text('Error: ${state.message}'));
           }
-          return const SizedBox.shrink();
+          return const Center(child: Text('Silakan muat produk'));
         },
       ),
     );

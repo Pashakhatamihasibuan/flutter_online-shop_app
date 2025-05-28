@@ -57,65 +57,61 @@ class Started implements CityEvent {
 
 /// @nodoc
 
-class GetCityByProvinceCode implements CityEvent {
-  const GetCityByProvinceCode(this.provinceCode);
+class GetCity implements CityEvent {
+  const GetCity(this.provId);
 
-  final String provinceCode;
+  final String provId;
 
   /// Create a copy of CityEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $GetCityByProvinceCodeCopyWith<GetCityByProvinceCode> get copyWith =>
-      _$GetCityByProvinceCodeCopyWithImpl<GetCityByProvinceCode>(
-          this, _$identity);
+  $GetCityCopyWith<GetCity> get copyWith =>
+      _$GetCityCopyWithImpl<GetCity>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is GetCityByProvinceCode &&
-            (identical(other.provinceCode, provinceCode) ||
-                other.provinceCode == provinceCode));
+            other is GetCity &&
+            (identical(other.provId, provId) || other.provId == provId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, provinceCode);
+  int get hashCode => Object.hash(runtimeType, provId);
 
   @override
   String toString() {
-    return 'CityEvent.getCityByProvinceCode(provinceCode: $provinceCode)';
+    return 'CityEvent.getCitiesByProvince(provId: $provId)';
   }
 }
 
 /// @nodoc
-abstract mixin class $GetCityByProvinceCodeCopyWith<$Res>
+abstract mixin class $GetCityCopyWith<$Res>
     implements $CityEventCopyWith<$Res> {
-  factory $GetCityByProvinceCodeCopyWith(GetCityByProvinceCode value,
-          $Res Function(GetCityByProvinceCode) _then) =
-      _$GetCityByProvinceCodeCopyWithImpl;
+  factory $GetCityCopyWith(GetCity value, $Res Function(GetCity) _then) =
+      _$GetCityCopyWithImpl;
   @useResult
-  $Res call({String provinceCode});
+  $Res call({String provId});
 }
 
 /// @nodoc
-class _$GetCityByProvinceCodeCopyWithImpl<$Res>
-    implements $GetCityByProvinceCodeCopyWith<$Res> {
-  _$GetCityByProvinceCodeCopyWithImpl(this._self, this._then);
+class _$GetCityCopyWithImpl<$Res> implements $GetCityCopyWith<$Res> {
+  _$GetCityCopyWithImpl(this._self, this._then);
 
-  final GetCityByProvinceCode _self;
-  final $Res Function(GetCityByProvinceCode) _then;
+  final GetCity _self;
+  final $Res Function(GetCity) _then;
 
   /// Create a copy of CityEvent
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? provinceCode = null,
+    Object? provId = null,
   }) {
-    return _then(GetCityByProvinceCode(
-      null == provinceCode
-          ? _self.provinceCode
-          : provinceCode // ignore: cast_nullable_to_non_nullable
+    return _then(GetCity(
+      null == provId
+          ? _self.provId
+          : provId // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }

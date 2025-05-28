@@ -1,5 +1,5 @@
 class BankAccountModel {
-  final int code;
+  final String code;
   final String name;
   final String image;
 

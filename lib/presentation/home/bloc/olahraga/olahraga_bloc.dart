@@ -14,7 +14,7 @@ class OlahragaBloc extends Bloc<OlahragaEvent, OlahragaState> {
     on<OlahragaEvent>((event, emit) async {
       emit(const OlahragaLoading());
 
-      final response = await productRemoteDatasource.getProductByCategory(9);
+      final response = await productRemoteDatasource.getProductByCategory(3);
       response.fold(
         (failure) => emit(const OlahragaError('Internal Server Error')),
         (productResponse) =>

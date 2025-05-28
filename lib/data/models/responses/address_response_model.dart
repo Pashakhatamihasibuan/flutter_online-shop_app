@@ -36,7 +36,6 @@ class Address {
   final String? phone;
   final String? provId;
   final String? cityId;
-  final String? districtId;
   final String? postalCode;
   final int? userId;
   final int? isDefault;
@@ -50,7 +49,6 @@ class Address {
     this.phone,
     this.provId,
     this.cityId,
-    this.districtId,
     this.postalCode,
     this.userId,
     this.isDefault,
@@ -69,7 +67,6 @@ class Address {
         phone: json["phone"],
         provId: json["prov_id"],
         cityId: json["city_id"],
-        districtId: json["district_id"],
         postalCode: json["postal_code"],
         userId: json["user_id"],
         isDefault: json["is_default"],
@@ -88,11 +85,15 @@ class Address {
         "phone": phone,
         "prov_id": provId,
         "city_id": cityId,
-        "district_id": districtId,
         "postal_code": postalCode,
         "user_id": userId,
         "is_default": isDefault,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
+
+  @override
+  String toString() {
+    return 'Address(id: $id, name: $name, fullAddress: $fullAddress, phone: $phone, provId: $provId, cityId: $cityId, postalCode: $postalCode, isDefault: $isDefault)';
+  }
 }

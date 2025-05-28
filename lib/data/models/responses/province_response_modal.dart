@@ -1,13 +1,10 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class ProvinceResponseModel {
-  final List<Province>? data;
-  final Meta? meta;
+  final Rajaongkir? rajaongkir;
 
   ProvinceResponseModel({
-    this.data,
-    this.meta,
+    this.rajaongkir,
   });
 
   factory ProvinceResponseModel.fromJson(String str) =>
@@ -17,27 +14,59 @@ class ProvinceResponseModel {
 
   factory ProvinceResponseModel.fromMap(Map<String, dynamic> json) =>
       ProvinceResponseModel(
-        data: json["data"] == null
-            ? []
-            : List<Province>.from(
-                json["data"]!.map((x) => Province.fromMap(x))),
-        meta: json["meta"] == null ? null : Meta.fromMap(json["meta"]),
+        rajaongkir: json["rajaongkir"] == null
+            ? null
+            : Rajaongkir.fromMap(json["rajaongkir"]),
       );
 
   Map<String, dynamic> toMap() => {
-        "data":
-            data == null ? [] : List<dynamic>.from(data!.map((x) => x.toMap())),
-        "meta": meta?.toMap(),
+        "rajaongkir": rajaongkir?.toMap(),
+      };
+}
+
+class Rajaongkir {
+  final List<dynamic>? query;
+  final Status? status;
+  final List<Province>? results;
+
+  Rajaongkir({
+    this.query,
+    this.status,
+    this.results,
+  });
+
+  factory Rajaongkir.fromJson(String str) =>
+      Rajaongkir.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory Rajaongkir.fromMap(Map<String, dynamic> json) => Rajaongkir(
+        query: json["query"] == null
+            ? []
+            : List<dynamic>.from(json["query"]!.map((x) => x)),
+        status: json["status"] == null ? null : Status.fromMap(json["status"]),
+        results: json["results"] == null
+            ? []
+            : List<Province>.from(
+                json["results"]!.map((x) => Province.fromMap(x))),
+      );
+
+  Map<String, dynamic> toMap() => {
+        "query": query == null ? [] : List<dynamic>.from(query!.map((x) => x)),
+        "status": status?.toMap(),
+        "results": results == null
+            ? []
+            : List<dynamic>.from(results!.map((x) => x.toMap())),
       };
 }
 
 class Province {
-  final String? code;
-  final String? name;
+  final String? provinceId;
+  final String? province;
 
   Province({
-    this.code,
-    this.name,
+    this.provinceId,
+    this.province,
   });
 
   factory Province.fromJson(String str) => Province.fromMap(json.decode(str));
@@ -45,41 +74,39 @@ class Province {
   String toJson() => json.encode(toMap());
 
   factory Province.fromMap(Map<String, dynamic> json) => Province(
+        provinceId: json["province_id"],
+        province: json["province"],
+      );
+
+  Map<String, dynamic> toMap() => {
+        "province_id": provinceId,
+        "province": province,
+      };
+
+  @override
+  String toString() => '$province';
+}
+
+class Status {
+  final int? code;
+  final String? description;
+
+  Status({
+    this.code,
+    this.description,
+  });
+
+  factory Status.fromJson(String str) => Status.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory Status.fromMap(Map<String, dynamic> json) => Status(
         code: json["code"],
-        name: json["name"],
+        description: json["description"],
       );
 
   Map<String, dynamic> toMap() => {
         "code": code,
-        "name": name,
-      };
-
-  @override
-  String toString() => '$name';
-}
-
-class Meta {
-  final int? administrativeAreaLevel;
-  final DateTime? updatedAt;
-
-  Meta({
-    this.administrativeAreaLevel,
-    this.updatedAt,
-  });
-
-  factory Meta.fromJson(String str) => Meta.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Meta.fromMap(Map<String, dynamic> json) => Meta(
-        administrativeAreaLevel: json["administrative_area_level"],
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "administrative_area_level": administrativeAreaLevel,
-        "updated_at": updatedAt?.toIso8601String(),
+        "description": description,
       };
 }

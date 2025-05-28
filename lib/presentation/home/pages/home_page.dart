@@ -17,7 +17,6 @@ import '../../../data/models/responses/category_response_model.dart';
 import '../../../data/models/responses/product_response_model.dart';
 import '../bloc/category/category_bloc.dart';
 import '../widgets/organism/menu_categories.dart';
-import '../widgets/organism/product_list.dart';
 import '../widgets/title_content.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -53,6 +52,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_hasInitialized) {
+      context.read<CheckoutBloc>().add(const CheckoutEvent.started());
       context.read<AllProductBloc>().add(const GetAllProducts());
       context.read<KantorBloc>().add(const GetKantor());
       context.read<MewarnaiBloc>().add(const GetMewarnai());
@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
           BlocBuilder<MewarnaiBloc, MewarnaiState>(
             builder: (context, state) {
               if (state is MewarnaiLoaded) {
-                final category = Category(id: 4, name: 'Alat Mewarnai');
+                final category = Category(id: 6, name: 'Alat Mewarnai');
                 return _buildProductSection(
                   title: category.name!,
                   category: category,

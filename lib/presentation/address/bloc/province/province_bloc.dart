@@ -9,26 +9,16 @@ part 'province_state.dart';
 part 'province_bloc.freezed.dart';
 
 class ProvinceBloc extends Bloc<ProvinceEvent, ProvinceState> {
-  final RajaongkirRemoteDatasource datasource;
+  final RajaongkirRemoteDatasource rajaongkirRemoteDatasource;
 
-  ProvinceBloc(this.datasource) : super(const ProvinceState.initial()) {
+  ProvinceBloc(this.rajaongkirRemoteDatasource)
+      : super(const ProvinceState.initial()) {
     on<GetProvinces>((event, emit) async {
       emit(const ProvinceState.loading());
-
-      final result = await datasource.searchDestination(event.keyword);
-
-      result.fold(
-        (error) => emit(ProvinceState.error(error)),
-        (response) {
-          final filtered = response.data!
-              .where((province) =>
-                  province.name != null &&
-                  province.name!
-                      .toLowerCase()
-                      .contains(event.keyword.toLowerCase()))
-              .toList();
-          emit(ProvinceState.loaded(filtered));
-        },
+      final response = await rajaongkirRemoteDatasource.getProvinces();
+      response.fold(
+        (l) => emit(ProvinceError(l)),
+        (r) => emit(ProvinceLoaded(r.rajaongkir?.results ?? [])),
       );
     });
   }

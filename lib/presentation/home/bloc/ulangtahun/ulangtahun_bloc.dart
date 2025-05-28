@@ -15,7 +15,7 @@ class UlangtahunBloc extends Bloc<UlangtahunEvent, UlangtahunState> {
     on<UlangtahunEvent>((event, emit) async {
       emit(const UlangtahunLoading());
 
-      final response = await productRemoteDatasource.getProductByCategory(13);
+      final response = await productRemoteDatasource.getProductByCategory(7);
       response.fold(
         (failure) => emit(const UlangtahunError('Internal Server Error')),
         (productResponse) =>

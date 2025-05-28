@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_onlineshop_app/presentation/home/bloc/checkout/checkout_bloc.dart';
+import 'package:flutter_onlineshop_app/presentation/orders/bloc/cost/cost_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/components/buttons.dart';
@@ -9,25 +12,34 @@ import '../models/bank_account_model.dart';
 import '../widgets/countdown_timer.dart';
 import '../widgets/payment_method.dart';
 
+extension RupiahFormat on int {
+  String get toRupiah {
+    return 'Rp${toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (match) => '${match[1]}.',
+    )}';
+  }
+}
+
 class PaymentDetailPage extends StatelessWidget {
   const PaymentDetailPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedPayment = ValueNotifier<int>(0);
+    final selectedPayment = ValueNotifier<String>('');
     final banks = [
       BankAccountModel(
-        code: 110,
+        code: 'bri',
         name: 'BRI Virtual Account',
         image: Assets.images.banks.bRIDirectDebit.path,
       ),
       BankAccountModel(
-        code: 111,
+        code: 'bca',
         name: 'BCA Virtual Account',
         image: Assets.images.banks.bca.path,
       ),
       BankAccountModel(
-        code: 112,
+        code: 'mandiri',
         name: 'Bank Mandiri',
         image: Assets.images.banks.mandiri.path,
       ),
@@ -93,6 +105,15 @@ class PaymentDetailPage extends StatelessWidget {
                         if (banksLimit.first != banks[index]) {
                           banksLimit[1] = banks[index];
                         }
+
+                        // Simpan payment method ke CheckoutBloc
+                        context.read<CheckoutBloc>().add(
+                              CheckoutEvent.addPaymentMethod(
+                                'bank_transfer',
+                                banks[index].code,
+                              ),
+                            );
+
                         context.pop();
                       },
                     ),
@@ -109,6 +130,19 @@ class PaymentDetailPage extends StatelessWidget {
     }
 
     void buyNowTap() {
+      // Dapatkan data checkout untuk API request
+      final checkoutBloc = context.read<CheckoutBloc>();
+      final apiRequest = checkoutBloc.toApiRequest();
+
+      // TODO: Kirim API request ke backend
+      print('API Request: $apiRequest');
+
+      // Navigasi ke halaman menunggu pembayaran
+      context.goNamed(
+        RouteConstants.paymentWaiting,
+        pathParameters: PathParameters().toMap(),
+      );
+
       showModalBottomSheet(
         context: context,
         useSafeArea: true,
@@ -250,7 +284,17 @@ class PaymentDetailPage extends StatelessWidget {
               itemBuilder: (context, index) => PaymentMethod(
                 isActive: value == banksLimit[index].code,
                 data: banksLimit[index],
-                onTap: () => selectedPayment.value = banksLimit[index].code,
+                onTap: () {
+                  selectedPayment.value = banksLimit[index].code;
+
+                  // Simpan payment method ke CheckoutBloc
+                  context.read<CheckoutBloc>().add(
+                        CheckoutEvent.addPaymentMethod(
+                          'bank_transfer',
+                          banksLimit[index].code,
+                        ),
+                      );
+                },
               ),
               separatorBuilder: (context, index) => const SpaceHeight(14.0),
               itemCount: banksLimit.length,
@@ -267,77 +311,99 @@ class PaymentDetailPage extends StatelessWidget {
             ),
           ),
           const SpaceHeight(12.0),
-          Row(
-            children: [
-              const Text(
-                'Total Belanja',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                375000.currencyFormatRp,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SpaceHeight(5.0),
-          Row(
-            children: [
-              const Text(
-                'Biaya Layanan',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                2000.currencyFormatRp,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SpaceHeight(8.0),
-          const Divider(),
-          const SpaceHeight(24.0),
-          Row(
-            children: [
-              const Text(
-                'Total Tagihan',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                377000.currencyFormatRp,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          BlocBuilder<CheckoutBloc, CheckoutState>(
+            builder: (context, checkoutState) {
+              return BlocBuilder<CostBloc, CostState>(
+                builder: (context, costState) {
+                  if (checkoutState is CheckoutLoaded &&
+                      costState is CostLoaded) {
+                    // Hitung total harga produk
+                    final totalProductPrice = checkoutState.products.fold<int>(
+                      0,
+                      (sum, item) =>
+                          sum + (item.product.price! * item.quantity),
+                    );
+
+                    // Ambil biaya pengiriman dari state atau dari CostBloc
+                    final shippingCost = checkoutState.shippingCost > 0
+                        ? checkoutState.shippingCost
+                        : costState.costResponseModel.rajaongkir?.results?.first
+                                .costs?.first.cost?.first.value ??
+                            0;
+
+                    // Update shipping cost ke CheckoutBloc jika belum ada
+                    if (checkoutState.shippingCost == 0 && shippingCost > 0) {
+                      final shippingService = costState
+                              .costResponseModel
+                              .rajaongkir
+                              ?.results
+                              ?.first
+                              .costs
+                              ?.first
+                              .service ??
+                          '';
+
+                      context.read<CheckoutBloc>().add(
+                            CheckoutEvent.addShippingService(
+                                shippingService, shippingCost),
+                          );
+                    }
+
+                    // Hitung total tagihan
+                    final totalBill = totalProductPrice + shippingCost;
+
+                    return Column(
+                      children: [
+                        _priceRow('Total Harga (Produk)', totalProductPrice),
+                        const SpaceHeight(5.0),
+                        _priceRow('Total Ongkos Kirim', shippingCost),
+                        const Divider(),
+                        const SpaceHeight(8.0),
+                        _priceRow('Total Belanja', totalBill.toInt()),
+                      ],
+                    );
+                  }
+                  return Column(
+                    children: [
+                      _priceRow('Total Harga (Produk)', 0),
+                      SpaceHeight(5.0),
+                      _priceRow('Total Ongkos Kirim', 0),
+                      Divider(),
+                      SpaceHeight(8.0),
+                      _priceRow('Total Belanja', 0),
+                    ],
+                  );
+                },
+              );
+            },
           ),
           const SpaceHeight(20.0),
           ValueListenableBuilder(
             valueListenable: selectedPayment,
             builder: (context, value, _) => Button.filled(
-              disabled: value == 0,
-              onPressed: () {
-                context.pushNamed(
-                  RouteConstants.paymentWaiting,
-                  pathParameters: PathParameters().toMap(),
-                );
-              },
+              disabled: value.isEmpty,
+              onPressed: value.isNotEmpty ? buyNowTap : () {},
               label: 'Bayar Sekarang',
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _priceRow(String title, int amount) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const Spacer(),
+        Text(
+          amount.toRupiah,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ],
     );
   }
 }

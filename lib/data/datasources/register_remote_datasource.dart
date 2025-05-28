@@ -16,7 +16,7 @@ class RegisterRemoteDatasource {
     required String roles,
   }) async {
     final response = await http.post(
-      Uri.parse('http://192.168.100.217:8000/api/register'),
+      Uri.parse('http://192.168.100.75:8000/api/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'name': name,

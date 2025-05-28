@@ -13,13 +13,13 @@ import 'package:flutter_onlineshop_app/presentation/auth/bloc/register/register_
 import 'package:flutter_onlineshop_app/presentation/home/bloc/alattulis/all_product_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/home/bloc/category/category_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/home/bloc/kantor/kantor_bloc.dart';
+import 'package:flutter_onlineshop_app/presentation/orders/bloc/cost/cost_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/constants/colors.dart';
 import 'core/router/app_router.dart';
 import 'data/datasources/rajaongkir_remote_datasource.dart';
 import 'presentation/address/bloc/address/address_bloc.dart';
 import 'presentation/address/bloc/city/city_bloc.dart';
-import 'presentation/address/bloc/district/district_bloc.dart';
 import 'presentation/home/bloc/checkout/checkout_bloc.dart';
 import 'presentation/home/bloc/mewarnai/mewarnai_bloc.dart';
 import 'presentation/home/bloc/olahraga/olahraga_bloc.dart';
@@ -55,13 +55,13 @@ class MyApp extends StatelessWidget {
             create: (_) =>
                 RegisterBloc(RegisterRemoteDatasource(client: http.Client()))),
         BlocProvider(create: (_) => ProductBloc(ProductRemoteDatasource())),
-        BlocProvider(create: (_) => AddressBloc(AddressRemoteDatasource())),
-        BlocProvider(create: (_) => AddAddressBloc(AddressRemoteDatasource())),
+        BlocProvider(create: (_) => AddressBloc(AddressRemoteDataSource())),
+        BlocProvider(create: (_) => AddAddressBloc(AddressRemoteDataSource())),
 
         // Wilayah - RajaOngkir
         BlocProvider(create: (_) => ProvinceBloc(rajaongkirDatasource)),
         BlocProvider(create: (_) => CityBloc(rajaongkirDatasource)),
-        BlocProvider(create: (_) => DistrictBloc(rajaongkirDatasource)),
+        BlocProvider(create: (_) => CostBloc(rajaongkirDatasource)),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

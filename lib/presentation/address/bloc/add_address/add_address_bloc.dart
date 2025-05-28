@@ -9,14 +9,14 @@ part 'add_address_state.dart';
 part 'add_address_bloc.freezed.dart';
 
 class AddAddressBloc extends Bloc<AddAddressEvent, AddAddressState> {
-  final AddressRemoteDatasource addressRemoteDatasource;
+  final AddressRemoteDataSource addressRemoteDataSource;
 
-  AddAddressBloc(this.addressRemoteDatasource)
+  AddAddressBloc(this.addressRemoteDataSource)
       : super(const AddAddressState.initial()) {
     on<AddAddress>((event, emit) async {
       emit(const AddAddressState.loading());
       final response =
-          await addressRemoteDatasource.addAddress(event.addressRequestModel);
+          await addressRemoteDataSource.addAddress(event.addressRequestModel);
       response.fold(
         (error) => emit(AddAddressState.error(error)),
         (_) => emit(const AddAddressState.success()),

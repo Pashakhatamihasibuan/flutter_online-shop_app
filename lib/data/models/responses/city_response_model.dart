@@ -1,13 +1,10 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class CityResponseModel {
-  final List<City>? data;
-  final Meta? meta;
+  final Rajaongkir? rajaongkir;
 
   CityResponseModel({
-    this.data,
-    this.meta,
+    this.rajaongkir,
   });
 
   factory CityResponseModel.fromJson(String str) =>
@@ -17,26 +14,84 @@ class CityResponseModel {
 
   factory CityResponseModel.fromMap(Map<String, dynamic> json) =>
       CityResponseModel(
-        data: json["data"] == null
-            ? []
-            : List<City>.from(json["data"]!.map((x) => City.fromMap(x))),
-        meta: json["meta"] == null ? null : Meta.fromMap(json["meta"]),
+        rajaongkir: json["rajaongkir"] == null
+            ? null
+            : Rajaongkir.fromMap(json["rajaongkir"]),
       );
 
   Map<String, dynamic> toMap() => {
-        "data":
-            data == null ? [] : List<dynamic>.from(data!.map((x) => x.toMap())),
-        "meta": meta?.toMap(),
+        "rajaongkir": rajaongkir?.toMap(),
+      };
+}
+
+class Rajaongkir {
+  final Query? query;
+  final Status? status;
+  final List<City>? results;
+
+  Rajaongkir({
+    this.query,
+    this.status,
+    this.results,
+  });
+
+  factory Rajaongkir.fromJson(String str) =>
+      Rajaongkir.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory Rajaongkir.fromMap(Map<String, dynamic> json) => Rajaongkir(
+        query: json["query"] == null ? null : Query.fromMap(json["query"]),
+        status: json["status"] == null ? null : Status.fromMap(json["status"]),
+        results: json["results"] == null
+            ? []
+            : List<City>.from(json["results"]!.map((x) => City.fromMap(x))),
+      );
+
+  Map<String, dynamic> toMap() => {
+        "query": query?.toMap(),
+        "status": status?.toMap(),
+        "results": results == null
+            ? []
+            : List<dynamic>.from(results!.map((x) => x.toMap())),
+      };
+}
+
+class Query {
+  final String? province;
+
+  Query({
+    this.province,
+  });
+
+  factory Query.fromJson(String str) => Query.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory Query.fromMap(Map<String, dynamic> json) => Query(
+        province: json["province"],
+      );
+
+  Map<String, dynamic> toMap() => {
+        "province": province,
       };
 }
 
 class City {
-  final String? code;
-  final String? name;
+  final String? cityId;
+  final String? provinceId;
+  final String? province;
+  final String? type;
+  final String? cityName;
+  final String? postalCode;
 
   City({
-    this.code,
-    this.name,
+    this.cityId,
+    this.provinceId,
+    this.province,
+    this.type,
+    this.cityName,
+    this.postalCode,
   });
 
   factory City.fromJson(String str) => City.fromMap(json.decode(str));
@@ -44,41 +99,47 @@ class City {
   String toJson() => json.encode(toMap());
 
   factory City.fromMap(Map<String, dynamic> json) => City(
+        cityId: json["city_id"],
+        provinceId: json["province_id"],
+        province: json["province"],
+        type: json["type"],
+        cityName: json["city_name"],
+        postalCode: json["postal_code"],
+      );
+
+  Map<String, dynamic> toMap() => {
+        "city_id": cityId,
+        "province_id": provinceId,
+        "province": province,
+        "type": type,
+        "city_name": cityName,
+        "postal_code": postalCode,
+      };
+
+  @override
+  String toString() => '$cityName';
+}
+
+class Status {
+  final int? code;
+  final String? description;
+
+  Status({
+    this.code,
+    this.description,
+  });
+
+  factory Status.fromJson(String str) => Status.fromMap(json.decode(str));
+
+  String toJson() => json.encode(toMap());
+
+  factory Status.fromMap(Map<String, dynamic> json) => Status(
         code: json["code"],
-        name: json["name"],
+        description: json["description"],
       );
 
   Map<String, dynamic> toMap() => {
         "code": code,
-        "name": name,
-      };
-
-  @override
-  String toString() => '$name';
-}
-
-class Meta {
-  final int? administrativeAreaLevel;
-  final DateTime? updatedAt;
-
-  Meta({
-    this.administrativeAreaLevel,
-    this.updatedAt,
-  });
-
-  factory Meta.fromJson(String str) => Meta.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Meta.fromMap(Map<String, dynamic> json) => Meta(
-        administrativeAreaLevel: json["administrative_area_level"],
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "administrative_area_level": administrativeAreaLevel,
-        "updated_at": updatedAt?.toIso8601String(),
+        "description": description,
       };
 }

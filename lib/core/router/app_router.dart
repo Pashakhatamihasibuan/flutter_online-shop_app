@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_onlineshop_app/data/models/responses/product_response_model.dart';
 import 'package:flutter_onlineshop_app/presentation/home/bloc/product/product_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/home/pages/dashboard_page.dart';
 import 'package:flutter_onlineshop_app/presentation/home/widgets/all_categories_page.dart';
+import 'package:flutter_onlineshop_app/presentation/home/widgets/product_detail_page.dart';
 import 'package:flutter_onlineshop_app/presentation/orders/pages/history_order_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -77,6 +79,15 @@ class AppRouter {
                   ..add(GetProductByCategory(category.id!)),
                 child: ProductsByCategoryPage(category: category),
               );
+            },
+          ),
+          GoRoute(
+            name: RouteConstants
+                .productDetail, // Make sure this matches your constant
+            path: 'product-detail', // Note: using hyphen instead of underscore
+            builder: (context, state) {
+              final product = state.extra as Product;
+              return ProductDetailPage(product: product);
             },
           ),
           GoRoute(

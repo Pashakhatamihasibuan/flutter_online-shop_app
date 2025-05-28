@@ -57,13 +57,13 @@ class Started implements AddressEvent {
 
 /// @nodoc
 
-class GetAddress implements AddressEvent {
-  const GetAddress();
+class GetAddresses implements AddressEvent {
+  const GetAddresses();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is GetAddress);
+        (other.runtimeType == runtimeType && other is GetAddresses);
   }
 
   @override
@@ -71,14 +71,14 @@ class GetAddress implements AddressEvent {
 
   @override
   String toString() {
-    return 'AddressEvent.getAddress()';
+    return 'AddressEvent.getAddresses()';
   }
 }
 
 /// @nodoc
 
-class UpdateAddress implements AddressEvent {
-  const UpdateAddress(
+class UpdateAddresses implements AddressEvent {
+  const UpdateAddresses(
       {required this.id,
       required this.name,
       required this.fullAddress,
@@ -86,7 +86,7 @@ class UpdateAddress implements AddressEvent {
       required this.phone,
       required this.provId,
       required this.cityId,
-      required this.districtId});
+      required this.isDefault});
 
   final int id;
   final String name;
@@ -95,20 +95,20 @@ class UpdateAddress implements AddressEvent {
   final String phone;
   final String provId;
   final String cityId;
-  final String districtId;
+  final int isDefault;
 
   /// Create a copy of AddressEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $UpdateAddressCopyWith<UpdateAddress> get copyWith =>
-      _$UpdateAddressCopyWithImpl<UpdateAddress>(this, _$identity);
+  $UpdateAddressesCopyWith<UpdateAddresses> get copyWith =>
+      _$UpdateAddressesCopyWithImpl<UpdateAddresses>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is UpdateAddress &&
+            other is UpdateAddresses &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.fullAddress, fullAddress) ||
@@ -118,26 +118,26 @@ class UpdateAddress implements AddressEvent {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.provId, provId) || other.provId == provId) &&
             (identical(other.cityId, cityId) || other.cityId == cityId) &&
-            (identical(other.districtId, districtId) ||
-                other.districtId == districtId));
+            (identical(other.isDefault, isDefault) ||
+                other.isDefault == isDefault));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, name, fullAddress,
-      postalCode, phone, provId, cityId, districtId);
+      postalCode, phone, provId, cityId, isDefault);
 
   @override
   String toString() {
-    return 'AddressEvent.updateAddress(id: $id, name: $name, fullAddress: $fullAddress, postalCode: $postalCode, phone: $phone, provId: $provId, cityId: $cityId, districtId: $districtId)';
+    return 'AddressEvent.updateAddresses(id: $id, name: $name, fullAddress: $fullAddress, postalCode: $postalCode, phone: $phone, provId: $provId, cityId: $cityId, isDefault: $isDefault)';
   }
 }
 
 /// @nodoc
-abstract mixin class $UpdateAddressCopyWith<$Res>
+abstract mixin class $UpdateAddressesCopyWith<$Res>
     implements $AddressEventCopyWith<$Res> {
-  factory $UpdateAddressCopyWith(
-          UpdateAddress value, $Res Function(UpdateAddress) _then) =
-      _$UpdateAddressCopyWithImpl;
+  factory $UpdateAddressesCopyWith(
+          UpdateAddresses value, $Res Function(UpdateAddresses) _then) =
+      _$UpdateAddressesCopyWithImpl;
   @useResult
   $Res call(
       {int id,
@@ -147,16 +147,16 @@ abstract mixin class $UpdateAddressCopyWith<$Res>
       String phone,
       String provId,
       String cityId,
-      String districtId});
+      int isDefault});
 }
 
 /// @nodoc
-class _$UpdateAddressCopyWithImpl<$Res>
-    implements $UpdateAddressCopyWith<$Res> {
-  _$UpdateAddressCopyWithImpl(this._self, this._then);
+class _$UpdateAddressesCopyWithImpl<$Res>
+    implements $UpdateAddressesCopyWith<$Res> {
+  _$UpdateAddressesCopyWithImpl(this._self, this._then);
 
-  final UpdateAddress _self;
-  final $Res Function(UpdateAddress) _then;
+  final UpdateAddresses _self;
+  final $Res Function(UpdateAddresses) _then;
 
   /// Create a copy of AddressEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -169,9 +169,9 @@ class _$UpdateAddressCopyWithImpl<$Res>
     Object? phone = null,
     Object? provId = null,
     Object? cityId = null,
-    Object? districtId = null,
+    Object? isDefault = null,
   }) {
-    return _then(UpdateAddress(
+    return _then(UpdateAddresses(
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -200,10 +200,10 @@ class _$UpdateAddressCopyWithImpl<$Res>
           ? _self.cityId
           : cityId // ignore: cast_nullable_to_non_nullable
               as String,
-      districtId: null == districtId
-          ? _self.districtId
-          : districtId // ignore: cast_nullable_to_non_nullable
-              as String,
+      isDefault: null == isDefault
+          ? _self.isDefault
+          : isDefault // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -401,6 +401,26 @@ class _$AddressErrorCopyWithImpl<$Res> implements $AddressErrorCopyWith<$Res> {
           : message // ignore: cast_nullable_to_non_nullable
               as String,
     ));
+  }
+}
+
+/// @nodoc
+
+class AddressUpdated implements AddressState {
+  const AddressUpdated();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AddressUpdated);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AddressState.updated()';
   }
 }
 

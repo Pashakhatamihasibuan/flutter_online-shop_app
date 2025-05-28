@@ -14,7 +14,7 @@ class KantorBloc extends Bloc<KantorEvent, KantorState> {
     on<KantorEvent>((event, emit) async {
       emit(const KantorLoading());
 
-      final response = await productRemoteDatasource.getProductByCategory(7);
+      final response = await productRemoteDatasource.getProductByCategory(2);
       response.fold(
         (failure) => emit(const KantorError('Internal Server Error')),
         (productResponse) =>

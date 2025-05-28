@@ -58,63 +58,20 @@ class Started implements ProvinceEvent {
 /// @nodoc
 
 class GetProvinces implements ProvinceEvent {
-  const GetProvinces(this.keyword);
-
-  final String keyword;
-
-  /// Create a copy of ProvinceEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $GetProvincesCopyWith<GetProvinces> get copyWith =>
-      _$GetProvincesCopyWithImpl<GetProvinces>(this, _$identity);
+  const GetProvinces();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is GetProvinces &&
-            (identical(other.keyword, keyword) || other.keyword == keyword));
+        (other.runtimeType == runtimeType && other is GetProvinces);
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, keyword);
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'ProvinceEvent.getProvinces(keyword: $keyword)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $GetProvincesCopyWith<$Res>
-    implements $ProvinceEventCopyWith<$Res> {
-  factory $GetProvincesCopyWith(
-          GetProvinces value, $Res Function(GetProvinces) _then) =
-      _$GetProvincesCopyWithImpl;
-  @useResult
-  $Res call({String keyword});
-}
-
-/// @nodoc
-class _$GetProvincesCopyWithImpl<$Res> implements $GetProvincesCopyWith<$Res> {
-  _$GetProvincesCopyWithImpl(this._self, this._then);
-
-  final GetProvinces _self;
-  final $Res Function(GetProvinces) _then;
-
-  /// Create a copy of ProvinceEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? keyword = null,
-  }) {
-    return _then(GetProvinces(
-      null == keyword
-          ? _self.keyword
-          : keyword // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'ProvinceEvent.getProvinces()';
   }
 }
 

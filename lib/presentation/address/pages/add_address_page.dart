@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_onlineshop_app/data/models/requests/address_request_model.dart';
 import 'package:flutter_onlineshop_app/data/models/responses/province_response_modal.dart';
 import 'package:flutter_onlineshop_app/data/models/responses/city_response_model.dart';
-import 'package:flutter_onlineshop_app/data/models/responses/district_response_model.dart';
 import 'package:flutter_onlineshop_app/presentation/address/bloc/province/province_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/address/bloc/city/city_bloc.dart';
-import 'package:flutter_onlineshop_app/presentation/address/bloc/district/district_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/address/bloc/address/address_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/address/bloc/add_address/add_address_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -34,12 +32,12 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
   Province? selectedProvince;
   City? selectedCity;
-  District? selectedDistrict;
+  // District? selectedDistrict;
 
   @override
   void initState() {
     super.initState();
-    context.read<ProvinceBloc>().add(const GetProvinces(''));
+    context.read<ProvinceBloc>().add(const GetProvinces());
   }
 
   @override
@@ -57,7 +55,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
           case AddAddressSuccess():
             Navigator.of(context).pop();
-            context.read<AddressBloc>().add(const AddressEvent.getAddress());
+            context.read<AddressBloc>().add(const AddressEvent.getAddresses());
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Alamat berhasil ditambahkan')),
             );
@@ -96,32 +94,32 @@ class _AddAddressPageState extends State<AddAddressPage> {
             BlocBuilder<ProvinceBloc, ProvinceState>(
               builder: (context, state) {
                 switch (state) {
+                  case ProvinceInitial():
+                    return const SizedBox.shrink();
                   case ProvinceLoading():
                     return const Center(child: CircularProgressIndicator());
-                  case ProvinceLoaded():
-                    final provinces = (state as ProvinceLoaded).provinces;
+                  case ProvinceLoaded(provinces: final provinces):
                     return CustomDropdown<Province>(
                       value: selectedProvince,
                       label: 'Provinsi',
                       items: provinces,
-                      itemBuilder: (item) => item.name ?? '-',
+                      itemBuilder: (item) => item.province ?? '-',
                       onChanged: (value) {
                         setState(() {
                           selectedProvince = value;
                           selectedCity = null;
-                          selectedDistrict = null;
+                          // selectedDistrict = null;
                         });
                         if (value != null) {
                           context.read<CityBloc>().add(
-                                GetCityByProvinceCode(value.code ?? ''),
+                                GetCity(value.provinceId ?? ''),
                               );
                         }
                       },
                     );
-                  case ProvinceError():
-                    final msg = (state as ProvinceError).message;
+                  case ProvinceError(message: final message):
                     return Text(
-                      'Gagal memuat provinsi: $msg',
+                      'Gagal memuat provinsi: $message',
                       style: const TextStyle(color: Colors.red),
                     );
                   default:
@@ -136,31 +134,26 @@ class _AddAddressPageState extends State<AddAddressPage> {
             BlocBuilder<CityBloc, CityState>(
               builder: (context, state) {
                 switch (state) {
+                  case CityInitial():
+                    return const SizedBox.shrink();
                   case CityLoading():
                     return const Center(child: CircularProgressIndicator());
-                  case CityLoaded():
-                    final cities = (state as CityLoaded).cities;
+                  case CityLoaded(cities: final cities):
                     return CustomDropdown<City>(
                       value: selectedCity,
                       label: 'Kota/Kabupaten',
                       items: cities,
-                      itemBuilder: (item) => item.name ?? '-',
+                      itemBuilder: (item) => item.cityName ?? '-',
                       onChanged: (value) {
                         setState(() {
                           selectedCity = value;
-                          selectedDistrict = null;
+                          // selectedDistrict = null;
                         });
-                        if (value != null) {
-                          context.read<DistrictBloc>().add(
-                                GetDistrictByRegencyCode(value.code ?? ''),
-                              );
-                        }
                       },
                     );
-                  case CityError():
-                    final msg = (state as CityError).message;
+                  case CityError(message: final message):
                     return Text(
-                      'Gagal memuat kota: $msg',
+                      'Gagal memuat kota: $message',
                       style: const TextStyle(color: Colors.red),
                     );
                   default:
@@ -168,40 +161,6 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 }
               },
             ),
-
-            const SpaceHeight(24),
-
-            /// Kecamatan
-            BlocBuilder<DistrictBloc, DistrictState>(
-              builder: (context, state) {
-                switch (state) {
-                  case DistrictLoading():
-                    return const Center(child: CircularProgressIndicator());
-                  case DistrictLoaded():
-                    final districts = (state as DistrictLoaded).districts;
-                    return CustomDropdown<District>(
-                      value: selectedDistrict,
-                      label: 'Kecamatan',
-                      items: districts,
-                      itemBuilder: (item) => item.name ?? '-',
-                      onChanged: (value) {
-                        setState(() {
-                          selectedDistrict = value;
-                        });
-                      },
-                    );
-                  case DistrictError():
-                    final msg = (state as DistrictError).message;
-                    return Text(
-                      'Gagal memuat kecamatan: $msg',
-                      style: const TextStyle(color: Colors.red),
-                    );
-                  default:
-                    return const SizedBox.shrink();
-                }
-              },
-            ),
-
             const SpaceHeight(24),
             CustomTextField(
               controller: zipCodeController,
@@ -216,13 +175,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
             Button.filled(
               onPressed: () {
+                // selectedDistrict == null
                 if (firstNameController.text.isEmpty ||
                     addressController.text.isEmpty ||
                     zipCodeController.text.isEmpty ||
                     phoneNumberController.text.isEmpty ||
                     selectedProvince == null ||
-                    selectedCity == null ||
-                    selectedDistrict == null) {
+                    selectedCity == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Harap lengkapi semua data')),
                   );
@@ -232,12 +191,11 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 final request = AddressRequestModel(
                   name: firstNameController.text,
                   fullAddress: addressController.text,
-                  provId: selectedProvince!.code!,
-                  cityId: selectedCity!.code!,
-                  districtId: selectedDistrict!.code!,
+                  provId: selectedProvince!.provinceId!,
+                  cityId: selectedCity!.cityId!,
                   postalCode: zipCodeController.text,
                   phone: phoneNumberController.text,
-                  isDefault: false,
+                  isDefault: 0, // Default ke 0 (tidak utama)
                 );
 
                 context.read<AddAddressBloc>().add(AddAddress(request));
