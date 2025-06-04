@@ -9,7 +9,12 @@ import '../widgets/product_tile.dart';
 import '../widgets/tracking_horizontal.dart';
 
 class TrackingOrderPage extends StatelessWidget {
-  const TrackingOrderPage({super.key});
+  final String orderId; // Tambahkan parameter orderId
+
+  const TrackingOrderPage({
+    super.key,
+    required this.orderId, // Jadikan orderId sebagai parameter wajib
+  });
 
   @override
   Widget build(BuildContext context) {

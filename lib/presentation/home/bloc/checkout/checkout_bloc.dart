@@ -120,7 +120,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       return {
         "address_id": currentState.addressId,
         "payment_method": currentState.paymentMethod,
-        "payment_VA_name": currentState.paymentVaName,
+        "payment_va_name": currentState.paymentVaName,
         "shipping_service": currentState.shippingService,
         "shipping_cost": currentState.shippingCost,
         "total_cost": totalCost,

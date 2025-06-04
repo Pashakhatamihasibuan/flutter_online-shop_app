@@ -7,6 +7,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart' as _svg;
@@ -67,23 +68,23 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
-    cart,
-    clock,
-    email,
-    eyeBold,
-    eyeOff,
-    home,
-    location,
-    notification,
-    order,
-    password,
-    person,
-    phone,
-    routing,
-    search,
-    shieldDone,
-    user,
-  ];
+        cart,
+        clock,
+        email,
+        eyeBold,
+        eyeOff,
+        home,
+        location,
+        notification,
+        order,
+        password,
+        person,
+        phone,
+        routing,
+        search,
+        shieldDone,
+        user,
+      ];
 }
 
 class $AssetsImagesGen {
@@ -120,12 +121,12 @@ class $AssetsImagesGen {
 
   /// List of all assets
   List<AssetGenImage> get values => [
-    banner1,
-    banner2,
-    google,
-    oops,
-    processOrder,
-  ];
+        banner1,
+        banner2,
+        google,
+        oops,
+        processOrder,
+      ];
 }
 
 class $AssetsImagesBanksGen {
@@ -134,13 +135,16 @@ class $AssetsImagesBanksGen {
   /// File path: assets/images/banks/BCA.png
   AssetGenImage get bca => const AssetGenImage('assets/images/banks/BCA.png');
 
-  /// File path: assets/images/banks/BRI Direct Debit.png
+  /// File path: assets/images/banks/BRI.png
   AssetGenImage get bRIDirectDebit =>
-      const AssetGenImage('assets/images/banks/BRI Direct Debit.png');
+      const AssetGenImage('assets/images/banks/BRI.png');
 
   /// File path: assets/images/banks/Mandiri.png
   AssetGenImage get mandiri =>
       const AssetGenImage('assets/images/banks/Mandiri.png');
+
+  /// File path: assets/images/banks/BNI.png
+  AssetGenImage get bni => const AssetGenImage('assets/images/banks/BNI.png');
 
   /// List of all assets
   List<AssetGenImage> get values => [bca, bRIDirectDebit, mandiri];
@@ -167,11 +171,11 @@ class $AssetsImagesCategoriesGen {
 
   /// List of all assets
   List<AssetGenImage> get values => [
-    menuAlattulis,
-    menuKantor,
-    menuMore,
-    menuOlahraga,
-  ];
+        menuAlattulis,
+        menuKantor,
+        menuMore,
+        menuOlahraga,
+      ];
 }
 
 class $AssetsImagesLogoGen {
@@ -221,15 +225,15 @@ class $AssetsImagesProductsGen {
 
   /// List of all assets
   List<AssetGenImage> get values => [
-    correctionpen,
-    earphone,
-    keyboard,
-    mac,
-    mac2,
-    pensil,
-    sepatu,
-    sepatu2,
-  ];
+        correctionpen,
+        earphone,
+        keyboard,
+        mac,
+        mac2,
+        pensil,
+        sepatu,
+        sepatu2,
+      ];
 }
 
 class Assets {
@@ -311,10 +315,10 @@ class AssetGenImage {
 
 class SvgGenImage {
   const SvgGenImage(this._assetName, {this.size, this.flavors = const {}})
-    : _isVecFormat = false;
+      : _isVecFormat = false;
 
   const SvgGenImage.vec(this._assetName, {this.size, this.flavors = const {}})
-    : _isVecFormat = true;
+      : _isVecFormat = true;
 
   final String _assetName;
   final Size? size;
@@ -368,8 +372,7 @@ class SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       semanticsLabel: semanticsLabel,
       excludeFromSemantics: excludeFromSemantics,
-      colorFilter:
-          colorFilter ??
+      colorFilter: colorFilter ??
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,
       cacheColorFilter: cacheColorFilter,

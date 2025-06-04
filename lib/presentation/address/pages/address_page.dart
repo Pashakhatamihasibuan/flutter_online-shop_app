@@ -11,6 +11,7 @@ import '../../../core/components/spaces.dart';
 import '../../../core/core.dart';
 import '../../../core/router/app_router.dart';
 import '../widgets/address_tile.dart';
+import 'package:badges/badges.dart' as badges;
 
 class AddressPage extends StatefulWidget {
   const AddressPage({super.key});
@@ -28,23 +29,45 @@ class _AddressPageState extends State<AddressPage> {
     context.read<AddressBloc>().add(const AddressEvent.getAddresses());
   }
 
+  Widget _buildBadgeCart(int quantity) {
+    final icon = IconButton(
+      onPressed: () {
+        context.goNamed(RouteConstants.cart,
+            pathParameters: PathParameters().toMap());
+      },
+      icon: Assets.icons.cart.svg(height: 24.0),
+    );
+    return quantity > 0
+        ? badges.Badge(
+            position: badges.BadgePosition.topEnd(top: 0, end: 0),
+            badgeContent:
+                Text('$quantity', style: const TextStyle(color: Colors.white)),
+            child: icon,
+          )
+        : icon;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Address'),
+        title: const Text('Asean Stationery'),
         actions: [
           IconButton(
-            onPressed: () {
-              context.goNamed(
-                RouteConstants.cart,
-                pathParameters: PathParameters(
-                  rootTab: RootTab.order,
-                ).toMap(),
-              );
-            },
-            icon: Assets.icons.cart.svg(height: 24.0),
+            onPressed: () {},
+            icon: Assets.icons.notification.svg(height: 24.0),
           ),
+          BlocBuilder<CheckoutBloc, CheckoutState>(
+            builder: (context, state) {
+              if (state is CheckoutLoaded) {
+                final totalQty = state.products
+                    .fold<int>(0, (sum, item) => sum + item.quantity);
+                return _buildBadgeCart(totalQty);
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          const SpaceWidth(8.0),
         ],
       ),
       body: BlocBuilder<AddressBloc, AddressState>(
