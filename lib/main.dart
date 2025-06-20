@@ -16,6 +16,7 @@ import 'package:flutter_onlineshop_app/presentation/home/bloc/category/category_
 import 'package:flutter_onlineshop_app/presentation/home/bloc/kantor/kantor_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/orders/bloc/cost/cost_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/orders/bloc/order/order_bloc.dart';
+import 'package:flutter_onlineshop_app/presentation/orders/bloc/status_order/status_order_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/constants/colors.dart';
 import 'core/router/app_router.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => AddressBloc(AddressRemoteDataSource())),
         BlocProvider(create: (_) => AddAddressBloc(AddressRemoteDataSource())),
         BlocProvider(create: (_) => OrderBloc(OrderRemoteDatasource())),
+        BlocProvider(create: (_) => StatusOrderBloc(OrderRemoteDatasource())),
 
         // Wilayah - RajaOngkir
         BlocProvider(create: (_) => ProvinceBloc(rajaongkirDatasource)),

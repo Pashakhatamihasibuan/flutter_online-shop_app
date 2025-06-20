@@ -36,7 +36,7 @@ class PaymentDetailPage extends StatelessWidget {
       BankAccountModel(
         code: 'bri',
         name: 'BRI Virtual Account',
-        image: Assets.images.banks.bRIDirectDebit.path,
+        image: Assets.images.banks.bri.path,
       ),
       BankAccountModel(
         code: 'bca',

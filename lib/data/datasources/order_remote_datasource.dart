@@ -7,6 +7,7 @@ import 'package:flutter_onlineshop_app/data/models/responses/order_response_mode
 import 'package:http/http.dart' as http;
 
 class OrderRemoteDatasource {
+  /// Fungsi untuk membuat pesanan baru
   Future<Either<String, OrderResponseModel>> order(
       OrderRequestModel orderRequestModel) async {
     try {
@@ -54,7 +55,6 @@ class OrderRemoteDatasource {
           print(
               '✅ OrderRemoteDatasource: Successfully created OrderResponseModel');
 
-          // Log the payment details specifically
           if (orderResponse.order != null) {
             print(
                 '💳 OrderRemoteDatasource: Order payment method: ${orderResponse.order!.paymentMethod}');
@@ -72,28 +72,16 @@ class OrderRemoteDatasource {
         }
       } else {
         String errorMessage = 'HTTP ${response.statusCode}';
-
         try {
           final errorBody = jsonDecode(response.body);
           print('❌ OrderRemoteDatasource: Error response body: $errorBody');
-
-          if (errorBody is Map<String, dynamic>) {
-            if (errorBody.containsKey('message')) {
-              errorMessage = errorBody['message'].toString();
-            } else if (errorBody.containsKey('error')) {
-              errorMessage = errorBody['error'].toString();
-            } else if (errorBody.containsKey('errors')) {
-              errorMessage = errorBody['errors'].toString();
-            }
+          if (errorBody is Map<String, dynamic> &&
+              errorBody.containsKey('message')) {
+            errorMessage = errorBody['message'];
           }
-        } catch (e) {
-          print(
-              '⚠️ OrderRemoteDatasource: Could not parse error response, using raw body');
-          errorMessage = response.body.isNotEmpty
-              ? response.body
-              : 'HTTP ${response.statusCode}';
+        } catch (_) {
+          errorMessage = response.body;
         }
-
         print(
             '❌ OrderRemoteDatasource: Request failed with error: $errorMessage');
         return left(errorMessage);
@@ -101,6 +89,54 @@ class OrderRemoteDatasource {
     } catch (e, stackTrace) {
       print('💥 OrderRemoteDatasource: Exception occurred: $e');
       print('📚 OrderRemoteDatasource: Stack trace: $stackTrace');
+      return left('Network error: ${e.toString()}');
+    }
+  }
+
+  /// Fungsi untuk mengecek status pembayaran
+  Future<Either<String, String>> checkPaymentStatus(String orderId) async {
+    try {
+      print('🔐 StatusCheck: Getting auth data...');
+      final authData = await AuthLocalDatasource().getAuthData();
+      if (authData == null) {
+        print('❌ StatusCheck: Auth data is null');
+        return left('Authentication data not found');
+      }
+      print('✅ StatusCheck: Auth data retrieved successfully.');
+
+      final url = Uri.parse('${Variables.baseUrl}/api/order/status/$orderId');
+      print('🌐 StatusCheck: Making request to: $url');
+
+      final headers = {
+        'Accept': 'application/json',
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer ${authData.accessToken}'
+      };
+      print('📤 StatusCheck: Request headers: $headers');
+
+      final response = await http.get(url, headers: headers);
+      print('📡 StatusCheck: Response status code: ${response.statusCode}');
+      print('📡 StatusCheck: Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // PERBAIKAN: Menggunakan try-catch untuk parsing JSON yang aman
+        try {
+          final data = jsonDecode(response.body);
+          final status = data['status'] as String;
+          print('✅ StatusCheck: Payment status is "$status"');
+          return right(status);
+        } catch (e) {
+          print('❌ StatusCheck: Failed to parse status response. Error: $e');
+          return left('Failed to parse response');
+        }
+      } else {
+        // PERBAIKAN: Memberikan pesan error yang lebih deskriptif
+        print('❌ StatusCheck: Failed to get status. Body: ${response.body}');
+        return left('Failed to get payment status');
+      }
+    } catch (e, stackTrace) {
+      print('💥 StatusCheck: Exception occurred: $e');
+      print('📚 StatusCheck: Stack trace: $stackTrace');
       return left('Network error: ${e.toString()}');
     }
   }
