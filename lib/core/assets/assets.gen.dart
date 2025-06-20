@@ -134,16 +134,18 @@ class $AssetsImagesBanksGen {
   /// File path: assets/images/banks/BCA.png
   AssetGenImage get bca => const AssetGenImage('assets/images/banks/BCA.png');
 
-  /// File path: assets/images/banks/BRI Direct Debit.png
-  AssetGenImage get bRIDirectDebit =>
-      const AssetGenImage('assets/images/banks/BRI Direct Debit.png');
+  /// File path: assets/images/banks/BNI.png
+  AssetGenImage get bni => const AssetGenImage('assets/images/banks/BNI.png');
+
+  /// File path: assets/images/banks/BRI.png
+  AssetGenImage get bri => const AssetGenImage('assets/images/banks/BRI.png');
 
   /// File path: assets/images/banks/Mandiri.png
   AssetGenImage get mandiri =>
       const AssetGenImage('assets/images/banks/Mandiri.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [bca, bRIDirectDebit, mandiri];
+  List<AssetGenImage> get values => [bca, bni, bri, mandiri];
 }
 
 class $AssetsImagesCategoriesGen {

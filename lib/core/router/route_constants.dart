@@ -1,71 +1,68 @@
-part of 'app_router.dart';
+// lib/core/router/route_constants.dart
+part of 'app_router.dart'; // Atau hapus jika tidak menggunakan part/part of untuk file ini
 
 class RouteConstants {
-  /// Splash Page
   static const String splash = 'splash';
   static const String splashPath = '/splash';
 
-  /// Login Page
   static const String login = 'login';
   static const String loginPath = '/login';
 
-  /// Register Page
   static const String register = 'register';
   static const String registerPath = 'register';
 
-  /// Dashboard / Root Page
   static const String root = 'root';
-  static const String rootPath = '/:root_tab';
+  static const String rootPath = '/'; // Path dasar untuk root
 
-  /// All Categories Page
-  static const String allCategories = 'all_categories';
-  static const String allCategoriesPath = 'categories';
+  static const String allCategories = 'allCategories';
+  static const String allCategoriesPath = 'all-categories';
 
-  /// Products by Category Page
-  static const String productsByCategory = 'products_by_category';
-  static const String productsByCategoryPath = 'products-by-category/:id';
+  static const String productsByCategory = 'productsByCategory';
+  static const String productsByCategoryPath =
+      'products-by-category/:id'; // :id sudah ada
 
-  /// Product Detail Page
-  static const String productDetail = 'product_detail';
-  static const String productDetailPath = 'product_detail';
+  static const String productDetail = 'productDetail';
+  static const String productDetailPath = 'product-detail';
 
-  /// Cart Page
+  static const String orderList = 'orderList';
+  static const String orderListPath = 'order-list';
+
   static const String cart = 'cart';
   static const String cartPath = 'cart';
 
-  /// Address Page
   static const String address = 'address';
   static const String addressPath = 'address';
 
-  /// Add Address Page
-  static const String addAddress = 'add_address';
-  static const String addAddressPath = 'address/add';
+  static const String addAddress = 'addAddress';
+  static const String addAddressPath = 'add-address';
 
-  /// Edit Address Page
-  static const String editAddress = 'edit_address';
-  static const String editAddressPath = 'address/edit';
+  static const String editAddress = 'editAddress';
+  static const String editAddressPath = 'edit-address/:id'; // :id sudah ada
 
-  /// Order Detail Page
-  static const String orderDetail = 'order_detail';
-  static const String orderDetailPath = 'order_detail';
+  static const String orderDetail = 'orderDetail';
+  static const String orderDetailPath = 'order-detail';
 
-  /// Payment Detail Page
-  static const String paymentDetail = 'payment_detail';
-  static const String paymentDetailPath = 'payment_detail';
+  static const String paymentDetail = 'paymentDetail';
+  static const String paymentDetailPath = 'payment-detail';
 
-  /// Tracking Order Page
-  static const String trackingOrder = 'tracking_order';
-  static const String trackingOrderPath = 'tracking_order';
+  static const String paymentWaiting = 'paymentWaiting';
+  static const String paymentWaitingPath = 'payment-waiting';
 
-  /// Shipping Detail Page
-  static const String shippingDetail = 'shipping_detail';
-  static const String shippingDetailPath = 'shipping_detail';
+  static const String trackingOrder = 'trackingOrder';
+  // --- PERBAIKAN DI SINI ---
+  // Definisikan path untuk trackingOrder agar menerima orderId.
+  // Parameter path diawali dengan ':'
+  static const String trackingOrderPath =
+      'tracking-order/:${RouteConstants.pathParamOrderId}';
+  // Jika trackingOrder adalah rute top-level (bukan sub-rute dari paymentDetail):
+  // static const String trackingOrderPath = '/tracking-order/:${RouteConstants.pathParamOrderId}';
 
-  /// Payment Waiting Page
-  static const String paymentWaiting = 'payment_waiting';
-  static const String paymentWaitingPath = 'payment_waiting';
+  static const String shippingDetail = 'shippingDetail';
+  static const String shippingDetailPath = 'shipping-detail';
 
-  /// Order List Page
-  static const String orderList = 'order_list';
-  static const String orderListPath = 'order_list';
+  // --- TAMBAHKAN KONSTANTA KUNCI PARAMETER ---
+  static const String pathParamOrderId = 'orderId';
+  static const String pathParamId =
+      'id'; // Untuk ID generik (categoryId, addressId)
+  static const String pathParamRootTab = 'root_tab';
 }
