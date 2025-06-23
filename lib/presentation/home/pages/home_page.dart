@@ -6,6 +6,7 @@ import 'package:flutter_onlineshop_app/presentation/home/bloc/kantor/kantor_bloc
 import 'package:flutter_onlineshop_app/presentation/home/bloc/mewarnai/mewarnai_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/home/bloc/olahraga/olahraga_bloc.dart';
 import 'package:flutter_onlineshop_app/presentation/home/bloc/ulangtahun/ulangtahun_bloc.dart';
+import 'package:flutter_onlineshop_app/presentation/home/pages/product_advertisement.dart';
 import 'package:flutter_onlineshop_app/presentation/home/widgets/banner_slider.dart';
 import '../widgets/organism/product_list.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +41,23 @@ class _HomePageState extends State<HomePage> {
     Assets.images.banner2.path,
     Assets.images.banner2.path,
     Assets.images.banner2.path,
+  ];
+
+  final List<Map<String, String>> adData = [
+    {
+      'image':
+          'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1099&q=80',
+      'title': 'Timeless Watches Collection',
+      'description':
+          'Elegance on your wrist. Explore our collection of premium watches crafted with precision and style.'
+    },
+    {
+      'image':
+          'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+      'title': 'New Arrival: Speed Runners',
+      'description':
+          'Experience comfort and performance with the latest in our footwear line. Perfect for your active lifestyle.'
+    }
   ];
 
   @override
@@ -136,7 +154,23 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const SpaceHeight(16.0),
-          BannerSlider(items: banners1),
+          BannerSlider(
+            items: banners1,
+            onTap: (index) {
+              if (index < adData.length) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductAdvertisementPage(
+                      imageUrl: adData[index]['image']!,
+                      title: adData[index]['title']!,
+                      description: adData[index]['description']!,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
           const SpaceHeight(12.0),
           BlocBuilder<CategoryBloc, CategoryState>(
             builder: (context, state) {
@@ -166,7 +200,23 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const SpaceHeight(50.0),
-          BannerSlider(items: banners2),
+          BannerSlider(
+            items: banners1,
+            onTap: (index) {
+              if (index < adData.length) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductAdvertisementPage(
+                      imageUrl: adData[index]['image']!,
+                      title: adData[index]['title']!,
+                      description: adData[index]['description']!,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
           const SpaceHeight(28.0),
           BlocBuilder<KantorBloc, KantorState>(
             builder: (context, state) {

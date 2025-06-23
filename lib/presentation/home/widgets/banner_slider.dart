@@ -6,7 +6,14 @@ import '../../../core/core.dart';
 
 class BannerSlider extends StatefulWidget {
   final List<String> items;
-  const BannerSlider({super.key, required this.items});
+  // Tambahkan callback onTap
+  final void Function(int index) onTap;
+
+  const BannerSlider({
+    super.key,
+    required this.items,
+    required this.onTap,
+  });
 
   @override
   State<BannerSlider> createState() => _BannerSliderState();
@@ -21,14 +28,20 @@ class _BannerSliderState extends State<BannerSlider> {
     return Column(
       children: [
         slider.CarouselSlider(
-          items: widget.items
-              .map((e) => Image.asset(
-                    e,
-                    height: 206.0,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.fill,
-                  ))
-              .toList(),
+          // PERUBAHAN: Bungkus gambar dengan GestureDetector
+          items: widget.items.asMap().entries.map((entry) {
+            final index = entry.key;
+            final e = entry.value;
+            return GestureDetector(
+              onTap: () => widget.onTap(index),
+              child: Image.asset(
+                e,
+                height: 206.0,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fill,
+              ),
+            );
+          }).toList(),
           carouselController: _controller,
           options: slider.CarouselOptions(
             autoPlay: true,
