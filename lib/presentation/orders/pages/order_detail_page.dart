@@ -13,6 +13,7 @@ import '../../../core/router/app_router.dart';
 
 extension RupiahFormat on int {
   String get toRupiah {
+    if (this == 0) return 'Rp 0';
     return 'Rp${toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (match) => '${match[1]}.',
@@ -28,34 +29,40 @@ class OrderDetailPage extends StatefulWidget {
 }
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
+  ShippingModel? selectedShipping;
+
   @override
   void initState() {
     super.initState();
-    // Debug: Print request parameters
-    print('=== API REQUEST PARAMETERS ===');
-    print('Origin: 501');
-    print('Destination: 114');
-    print('Weight: 1700');
-    print('Courier: jne');
-    print('==============================');
+    final checkoutState = context.read<CheckoutBloc>().state;
+    if (checkoutState is CheckoutLoaded) {
+      final destinationCityId = checkoutState.addressId.toString();
 
-    context.read<CostBloc>().add(
-          const CostEvent.getCost(
-            '501', // origin
-            '114', // destination
-            '1700', // weight
-            'tiki', // courier - CHANGED FROM 'jne' TO 'tiki'
-          ),
-        );
+      // PERBAIKAN: Selalu gunakan berat statis 150 gram per item
+      final totalWeight = checkoutState.products.fold<int>(
+        0,
+        (previousValue, element) => previousValue + (150 * element.quantity),
+      );
+
+      // Pastikan ada tujuan dan berat sebelum memanggil API
+      if (destinationCityId != '0' && totalWeight > 0) {
+        context.read<CostBloc>().add(
+              CostEvent.getCost(
+                '501', // ID kota asal (contoh: Yogyakarta)
+                destinationCityId,
+                totalWeight.toString(),
+                'tiki', // Kurir default
+              ),
+            );
+      }
+    }
   }
-
-  ShippingModel? selectedShipping;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Orders'),
+        title: const Text('Detail Pesanan'),
         actions: [
           BlocBuilder<CheckoutBloc, CheckoutState>(
             builder: (context, state) {
@@ -76,12 +83,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           BlocBuilder<CheckoutBloc, CheckoutState>(
             builder: (context, state) {
               if (state is CheckoutLoaded) {
-                final carts = state.products;
                 return ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: carts.length,
-                  itemBuilder: (context, index) => CartTile(data: carts[index]),
+                  itemCount: state.products.length,
+                  itemBuilder: (context, index) =>
+                      CartTile(data: state.products[index]),
                   separatorBuilder: (context, index) => const SpaceHeight(16.0),
                 );
               }
@@ -94,6 +101,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               setState(() {
                 selectedShipping = shipping;
               });
+              // Simpan ongkos kirim dan layanan ke CheckoutBloc
+              context.read<CheckoutBloc>().add(
+                    CheckoutEvent.addShippingService(
+                      shipping.type,
+                      shipping.priceStart,
+                    ),
+                  );
             },
             selectedShipping: selectedShipping,
           ),
@@ -111,12 +125,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           BlocBuilder<CheckoutBloc, CheckoutState>(
             builder: (context, state) {
               if (state is CheckoutLoaded) {
-                final carts = state.products;
-                final totalProductPrice = carts.fold<int>(
+                final totalProductPrice = state.products.fold<int>(
                   0,
                   (total, item) =>
-                      total + (item.product.price! * item.quantity),
+                      total + ((item.product.price ?? 0) * item.quantity),
                 );
+                // Ambil biaya pengiriman dari state lokal yang sudah diupdate
                 final shippingCost = selectedShipping?.priceStart ?? 0;
                 final totalPrice = totalProductPrice + shippingCost;
 
@@ -136,10 +150,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           const SpaceHeight(20.0),
           Button.filled(
+            disabled: selectedShipping ==
+                null, // Nonaktifkan jika pengiriman belum dipilih
             onPressed: () {
               context.goNamed(
                 RouteConstants.paymentDetail,
-                pathParameters: PathParameters().toMap(),
+                pathParameters: GoRouterState.of(context).pathParameters,
               );
             },
             label: 'Pilih Pembayaran',
@@ -166,20 +182,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 }
 
-class _SelectShipping extends StatefulWidget {
+class _SelectShipping extends StatelessWidget {
   final Function(ShippingModel) onSelected;
   final ShippingModel? selectedShipping;
 
   const _SelectShipping({
     required this.onSelected,
-    required this.selectedShipping,
+    this.selectedShipping,
   });
 
-  @override
-  State<_SelectShipping> createState() => _SelectShippingState();
-}
-
-class _SelectShippingState extends State<_SelectShipping> {
   @override
   Widget build(BuildContext context) {
     void onSelectShippingTap() {
@@ -188,7 +199,7 @@ class _SelectShippingState extends State<_SelectShipping> {
         useSafeArea: true,
         isScrollControlled: true,
         backgroundColor: AppColors.white,
-        builder: (BuildContext context) {
+        builder: (BuildContext modalContext) {
           return Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -233,58 +244,10 @@ class _SelectShippingState extends State<_SelectShipping> {
                 const Divider(color: AppColors.stroke),
                 BlocBuilder<CostBloc, CostState>(
                   builder: (context, state) {
-                    // Debug: Print state type
-                    print('Current CostBloc state: ${state.runtimeType}');
-
                     if (state is CostLoaded) {
-                      final costResponse = state.costResponseModel;
-                      final results = costResponse.rajaongkir?.results;
-
-                      // Debug: Print complete response structure
-                      print('=== API RESPONSE DEBUG ===');
-                      print('Results count: ${results?.length ?? 0}');
-
-                      if (results != null && results.isNotEmpty) {
-                        print(
-                            'Courier: ${results[0].code} - ${results[0].name}');
-                        final costs = results[0].costs;
-                        print('Costs count: ${costs?.length ?? 0}');
-
-                        // Print all costs with details
-                        if (costs != null) {
-                          for (int i = 0; i < costs.length; i++) {
-                            final cost = costs[i];
-                            final costValue = cost.cost?.firstOrNull?.value;
-                            final etd = cost.cost?.firstOrNull?.etd;
-                            print(
-                                'Cost $i: ${cost.service} - ${cost.description} - Rp$costValue - ${etd} days');
-                          }
-                        }
-                      }
-                      print('========================');
-
-                      if (results == null || results.isEmpty) {
-                        return const Center(
-                            child: Text('Tidak ada data pengiriman'));
-                      }
-
-                      final costs = results[0].costs;
-
-                      // Debug: Print costs
-                      print('Costs count: ${costs?.length ?? 0}');
-
-                      if (costs == null || costs.isEmpty) {
-                        return const Center(
-                            child: Text('Tidak ada biaya pengiriman'));
-                      }
-
-                      // Debug: Print each cost item
-                      for (int i = 0; i < costs.length; i++) {
-                        final cost = costs[i];
-                        print(
-                            'Cost $i: ${cost.service} - ${cost.description} - ${cost.cost?.firstOrNull?.value}');
-                      }
-
+                      final costs = state.costResponseModel.rajaongkir?.results
+                              ?.firstOrNull?.costs ??
+                          [];
                       return Container(
                         constraints: BoxConstraints(
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
@@ -295,26 +258,20 @@ class _SelectShippingState extends State<_SelectShipping> {
                             final item = costs[index];
                             final costValue = item.cost?.firstOrNull?.value;
                             final etd = item.cost?.firstOrNull?.etd ?? '-';
-
-                            // Debug: Print item being built
-                            print(
-                                'Building item $index: ${item.service} - ${item.description}');
-
                             return ListTile(
                               contentPadding: EdgeInsets.zero,
                               onTap: () {
-                                print(
-                                    'Tapped on: ${item.service} - ${item.description}');
-
-                                if ((item.description != null ||
-                                        item.service != null) &&
-                                    costValue != null) {
-                                  widget.onSelected(ShippingModel(
-                                    type: item.service ?? item.description!,
+                                if (costValue != null) {
+                                  onSelected(ShippingModel(
+                                    type:
+                                        '${item.service ?? ''} (${item.description ?? ''})',
                                     priceStart: costValue,
                                     priceEnd: costValue,
                                     estimate: DateTime.now().add(
-                                      Duration(days: int.tryParse(etd) ?? 3),
+                                      Duration(
+                                          days: int.tryParse(
+                                                  etd.split(' ').first) ??
+                                              3),
                                     ),
                                   ));
                                   context.pop();
@@ -329,7 +286,7 @@ class _SelectShippingState extends State<_SelectShipping> {
                                 'Estimasi tiba $etd Hari',
                                 style: const TextStyle(fontSize: 12),
                               ),
-                              trailing: Icon(
+                              trailing: const Icon(
                                 Icons.chevron_right,
                                 color: AppColors.primary,
                               ),
@@ -340,60 +297,24 @@ class _SelectShippingState extends State<_SelectShipping> {
                           itemCount: costs.length,
                         ),
                       );
-                    } else if (state is CostLoading) {
+                    }
+                    if (state is CostLoading) {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(20.0),
                           child: CircularProgressIndicator(),
                         ),
                       );
-                    } else if (state is CostError) {
-                      final errorState = state as CostError;
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.error_outline,
-                                size: 48,
-                                color: Colors.red,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Error: ${errorState.message}',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Retry the API call with same parameters
-                                  print('=== RETRYING API CALL ===');
-                                  context.read<CostBloc>().add(
-                                        const CostEvent.getCost(
-                                          '501',
-                                          '114',
-                                          '1700',
-                                          'tiki', // Make sure using 'tiki' not 'jne'
-                                        ),
-                                      );
-                                },
-                                child: const Text('Coba Lagi'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20.0),
-                          child: Text('Memuat data pengiriman...'),
-                        ),
-                      );
                     }
+                    if (state is CostError) {
+                      return Center(child: Text(state.message));
+                    }
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text('Memuat data pengiriman...'),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -416,8 +337,8 @@ class _SelectShippingState extends State<_SelectShipping> {
           children: [
             Expanded(
               child: Text(
-                widget.selectedShipping != null
-                    ? '${widget.selectedShipping!.type} - ${widget.selectedShipping!.priceStart.toRupiah}'
+                selectedShipping != null
+                    ? '${selectedShipping!.type} - ${selectedShipping!.priceStart.toRupiah}'
                     : 'Pilih Pengiriman',
                 style: const TextStyle(fontSize: 16),
                 overflow: TextOverflow.ellipsis,
@@ -435,7 +356,7 @@ Widget _buildBadgeCart(BuildContext context, int quantity) {
   final icon = IconButton(
     onPressed: () {
       context.goNamed(RouteConstants.cart,
-          pathParameters: PathParameters().toMap());
+          pathParameters: GoRouterState.of(context).pathParameters);
     },
     icon: Assets.icons.cart.svg(height: 24.0),
   );
@@ -461,15 +382,4 @@ class ShippingModel {
     required this.priceEnd,
     required this.estimate,
   });
-
-  String get priceFormat => priceStart.toRupiah;
-  String get priceRangeFormat =>
-      '${priceStart.toRupiah} - ${priceEnd.toRupiah}';
-
-  String get estimateFormat {
-    final day = estimate.day.toString().padLeft(2, '0');
-    final month = estimate.month.toString().padLeft(2, '0');
-    final year = estimate.year;
-    return '$day/$month/$year';
-  }
 }
