@@ -244,7 +244,7 @@ class _PaymentWaitingPageState extends State<PaymentWaitingPage> {
               if (state is StatusOrderLoaded && !_isPaymentSuccessShown) {
                 debugPrint('Payment status received: ${state.status}');
 
-                if (state.status.toLowerCase() == 'paid') {
+                if (state.status.toLowerCase() == 'settlement') {
                   debugPrint('Payment is paid! Starting 5-second delay...');
 
                   // Wait 5 seconds before showing success modal

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_onlineshop_app/core/components/core.dart';
 import 'package:flutter_onlineshop_app/presentation/home/models/product_quantity.dart';
-import 'package:flutter_onlineshop_app/presentation/orders/bloc/order/order_bloc.dart';
-import 'package:flutter_onlineshop_app/presentation/orders/pages/order_detail_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/components/buttons.dart';
@@ -10,20 +9,9 @@ import '../../../core/components/spaces.dart';
 import '../../../core/core.dart';
 import '../../../core/router/app_router.dart';
 import '../../home/bloc/checkout/checkout_bloc.dart';
-import '../bloc/cost/cost_bloc.dart';
+import '../bloc/order/order_bloc.dart';
 import '../models/bank_account_model.dart';
 import '../widgets/payment_method.dart';
-
-// Asumsi ekstensi toRupiah sudah ada di core.dart atau int_ext.dart dan diimpor melalui core.dart
-// extension RupiahFormatOnIntForPaymentDetail on int {
-//   String get toRupiah {
-//     if (this == 0) return 'Rp0';
-//     return 'Rp${toString().replaceAllMapped(
-//       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-//       (match) => '${match[1]}.',
-//     )}';
-//   }
-// }
 
 class PaymentDetailPage extends StatelessWidget {
   const PaymentDetailPage({super.key});
@@ -34,25 +22,21 @@ class PaymentDetailPage extends StatelessWidget {
 
     final banks = [
       BankAccountModel(
-        code: 'bri',
-        name: 'BRI Virtual Account',
-        image: Assets.images.banks.bri.path,
-      ),
+          code: 'bri',
+          name: 'BRI Virtual Account',
+          image: Assets.images.banks.bri.path),
       BankAccountModel(
-        code: 'bca',
-        name: 'BCA Virtual Account',
-        image: Assets.images.banks.bca.path,
-      ),
+          code: 'bca',
+          name: 'BCA Virtual Account',
+          image: Assets.images.banks.bca.path),
       BankAccountModel(
-        code: 'mandiri',
-        name: 'Bank Mandiri VA',
-        image: Assets.images.banks.mandiri.path,
-      ),
+          code: 'mandiri',
+          name: 'Bank Mandiri VA',
+          image: Assets.images.banks.mandiri.path),
       BankAccountModel(
-        code: 'bni',
-        name: 'BNI Virtual Account',
-        image: Assets.images.banks.bni.path,
-      ),
+          code: 'bni',
+          name: 'BNI Virtual Account',
+          image: Assets.images.banks.bni.path),
     ];
 
     void seeAllTap() {
@@ -91,10 +75,7 @@ class PaymentDetailPage extends StatelessWidget {
                       backgroundColor: AppColors.light,
                       child: IconButton(
                         onPressed: () => Navigator.of(modalContext).pop(),
-                        icon: const Icon(
-                          Icons.close,
-                          color: AppColors.primary,
-                        ),
+                        icon: const Icon(Icons.close, color: AppColors.primary),
                       ),
                     ),
                   ],
@@ -138,72 +119,29 @@ class PaymentDetailPage extends StatelessWidget {
       ),
       body: BlocListener<OrderBloc, OrderState>(
         listener: (context, state) {
-          debugPrint('PaymentDetailPage - OrderBloc state changed: $state');
           if (state is DoOrderLoaded) {
-            debugPrint(
-                'PaymentDetailPage - Order successful, navigating to PaymentWaitingPage.');
-            // Dapatkan 'root_tab' saat ini atau default ke '0'
-            final currentPathParams = GoRouterState.of(context).pathParameters;
-            final rootTabParam =
-                currentPathParams[RouteConstants.pathParamRootTab] ?? '0';
-
-            // Navigasi ke PaymentWaitingPage setelah order berhasil
             context.goNamed(
               RouteConstants.paymentWaiting,
-              pathParameters: {
-                RouteConstants.pathParamRootTab: rootTabParam,
-                // Jika ada parameter path lain yang dibutuhkan oleh rute induk (orderDetail, paymentDetail),
-                // tambahkan di sini. Berdasarkan AppRouter Anda, sepertinya tidak ada.
-              },
-              // Tidak perlu mengirim 'extra' jika PaymentWaitingPage mengambil data dari BlocProvider
+              pathParameters: GoRouterState.of(context).pathParameters,
             );
-          } else if (state is DoOrderError) {
-            debugPrint('PaymentDetailPage - Order error: ${state.message}');
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Gagal memproses pesanan: ${state.message}'),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
           }
-          // Anda bisa menangani DoOrderLoading di sini untuk menampilkan dialog loading global
-          // jika tombol tidak di-disable.
+          if (state is DoOrderError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
         child: ListView(
           padding: const EdgeInsets.all(20.0),
           children: [
-            // Countdown timer mungkin tidak relevan di halaman ini sebelum pembayaran
-            // Jika tetap ingin ada, pastikan fungsinya jelas.
-            // Row(
-            //   children: [
-            //     const Icon(Icons.schedule),
-            //     const SpaceWidth(12.0),
-            //     const Flexible(
-            //       child: Text(
-            //         'Selesaikan Pembayaran Dalam',
-            //         overflow: TextOverflow.ellipsis,
-            //       ),
-            //     ),
-            //     const SpaceWidth(12.0),
-            //     CountdownTimer(
-            //       minute: 120,
-            //       onTimerCompletion: () {},
-            //     ),
-            //   ],
-            // ),
-            // const SpaceHeight(30.0),
-
             Row(
               children: [
                 const Text(
                   'Metode Pembayaran',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const Spacer(),
                 InkWell(
@@ -211,10 +149,9 @@ class PaymentDetailPage extends StatelessWidget {
                   child: const Text(
                     'Lihat semua',
                     style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -255,51 +192,33 @@ class PaymentDetailPage extends StatelessWidget {
             const SpaceHeight(8.0),
             const Text(
               'Ringkasan Pembayaran',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SpaceHeight(12.0),
             BlocBuilder<CheckoutBloc, CheckoutState>(
               builder: (context, checkoutState) {
-                return BlocBuilder<CostBloc, CostState>(
-                  builder: (context, costState) {
-                    int totalProductPrice = 0;
-                    int shippingCost = 0;
-                    int totalBill = 0;
+                if (checkoutState is CheckoutLoaded) {
+                  final totalProductPrice = checkoutState.products.fold<int>(
+                    0,
+                    (sum, item) =>
+                        sum + ((item.product.price ?? 0) * item.quantity),
+                  );
+                  final totalBill =
+                      totalProductPrice + checkoutState.shippingCost;
 
-                    if (checkoutState is CheckoutLoaded) {
-                      totalProductPrice = checkoutState.products.fold<int>(
-                        0,
-                        (sum, item) =>
-                            sum + ((item.product.price ?? 0) * item.quantity),
-                      );
-
-                      if (checkoutState.shippingCost > 0) {
-                        shippingCost = checkoutState.shippingCost;
-                      } else if (costState is CostLoaded) {
-                        final costs = costState.costResponseModel.rajaongkir
-                            ?.results?.firstOrNull?.costs;
-                        final firstCostValue =
-                            costs?.firstOrNull?.cost?.firstOrNull?.value;
-                        shippingCost = firstCostValue ?? 0;
-                      }
-                      totalBill = totalProductPrice + shippingCost;
-                    }
-
-                    return Column(
-                      children: [
-                        _priceRow('Total Harga (Produk)', totalProductPrice),
-                        const SpaceHeight(5.0),
-                        _priceRow('Total Ongkos Kirim', shippingCost),
-                        const Divider(),
-                        const SpaceHeight(8.0),
-                        _priceRow('Total Tagihan', totalBill),
-                      ],
-                    );
-                  },
-                );
+                  return Column(
+                    children: [
+                      _priceRow('Total Harga (Produk)', totalProductPrice),
+                      const SpaceHeight(5.0),
+                      _priceRow(
+                          'Total Ongkos Kirim', checkoutState.shippingCost),
+                      const Divider(),
+                      const SpaceHeight(8.0),
+                      _priceRow('Total Tagihan', totalBill),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
               },
             ),
             const SpaceHeight(30.0),
@@ -307,130 +226,65 @@ class PaymentDetailPage extends StatelessWidget {
               builder: (context, orderState) {
                 return ValueListenableBuilder<BankAccountModel?>(
                   valueListenable: selectedPaymentNotifier,
-                  builder: (context, selectedBankFromNotifier, _) {
-                    final bool isDisabled = selectedBankFromNotifier == null ||
-                        orderState is DoOrderLoading;
+                  builder: (context, selectedBank, _) {
+                    final bool isLoading = orderState is DoOrderLoading;
+                    final bool isDisabled = selectedBank == null || isLoading;
+
                     return Button.filled(
                       disabled: isDisabled,
                       onPressed: () {
-                        // Fungsi buyNowTap sekarang ada di sini
                         if (isDisabled) return;
 
                         final checkoutState =
                             context.read<CheckoutBloc>().state;
-                        final costState = context.read<CostBloc>().state;
 
                         if (checkoutState is CheckoutLoaded) {
-                          final int addressId = checkoutState.addressId;
-                          if (addressId == 0) {
-                            // Validasi addressId
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Alamat pengiriman belum dipilih.')),
-                              );
-                            }
+                          if (checkoutState.addressId == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Alamat pengiriman belum dipilih.')),
+                            );
+                            return;
+                          }
+                          if (checkoutState.shippingService.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Metode pengiriman belum dipilih.')),
+                            );
+                            return;
+                          }
+                          if (checkoutState.paymentMethod.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Metode pembayaran belum dipilih.')),
+                            );
                             return;
                           }
 
-                          final String paymentMethod = 'bank_transfer';
-                          final String paymentVaName =
-                              selectedBankFromNotifier.code;
-
-                          int currentShippingCost = checkoutState.shippingCost;
-                          String currentShippingService =
-                              checkoutState.shippingService;
-
-                          // Pastikan shipping cost dan service sudah ada jika ada produk
-                          if (checkoutState.products.isNotEmpty) {
-                            if (currentShippingCost == 0 &&
-                                costState is CostLoaded) {
-                              final costs = costState.costResponseModel
-                                  .rajaongkir?.results?.firstOrNull?.costs;
-                              currentShippingCost = costs
-                                      ?.firstOrNull?.cost?.firstOrNull?.value ??
-                                  0;
-                              currentShippingService =
-                                  costs?.firstOrNull?.service ??
-                                      'Unknown Service';
-                            }
-                            if (currentShippingCost == 0 &&
-                                currentShippingService.isEmpty) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Biaya atau layanan pengiriman belum ditentukan.')),
-                                );
-                              }
-                              return;
-                            }
-                          }
-
-                          final List<ProductQuantity> productsForOrder =
+                          final productsForOrder =
                               checkoutState.products.map((item) {
                             return ProductQuantity(
                                 product: item.product, quantity: item.quantity);
                           }).toList();
 
-                          if (productsForOrder.isEmpty) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Keranjang belanja Anda kosong.')),
+                          // PERBAIKAN: Hapus 'subtotal' dan 'totalCost' dari pemanggilan event
+                          context.read<OrderBloc>().add(
+                                DoOrder(
+                                  addressId: checkoutState.addressId,
+                                  paymentMethod: checkoutState.paymentMethod,
+                                  shippingService:
+                                      checkoutState.shippingService,
+                                  shippingCost: checkoutState.shippingCost,
+                                  paymentVaName: checkoutState.paymentVaName,
+                                  products: productsForOrder,
+                                ),
                               );
-                            }
-                            return;
-                          }
-
-                          // Hitung subtotal dan totalCost di sini sebelum mengirim ke BLoC
-                          int subtotal = 0;
-                          for (var pq in productsForOrder) {
-                            subtotal += (pq.product.price ?? 0) * pq.quantity;
-                          }
-                          int totalCost = subtotal + currentShippingCost;
-
-                          debugPrint(
-                              'PaymentDetailPage - Dispatching DoOrder event with:');
-                          debugPrint('  addressId: $addressId');
-                          debugPrint('  paymentMethod: $paymentMethod');
-                          debugPrint(
-                              '  shippingService: $currentShippingService');
-                          debugPrint('  shippingCost: $currentShippingCost');
-                          debugPrint('  paymentVaName: $paymentVaName');
-                          debugPrint('  subtotal (calculated): $subtotal');
-                          debugPrint('  totalCost (calculated): $totalCost');
-                          debugPrint(
-                              '  products count: ${productsForOrder.length}');
-
-                          // Dispatch event DoOrder
-                          context.read<OrderBloc>().add(DoOrder(
-                                addressId: addressId,
-                                paymentMethod: paymentMethod,
-                                shippingService:
-                                    currentShippingService, // Kirim service yang benar
-                                shippingCost:
-                                    currentShippingCost, // Kirim cost yang benar
-                                paymentVaName: paymentVaName,
-                                products: productsForOrder,
-                                // subtotal dan totalCost akan dihitung oleh BLoC atau backend
-                                // Jika BLoC Anda menghitungnya, pastikan sudah benar
-                              ));
-                        } else {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Data checkout tidak lengkap.')),
-                            );
-                          }
                         }
                       },
-                      label: orderState is DoOrderLoading
-                          ? 'MEMPROSES...'
-                          : 'Bayar Sekarang',
+                      label: isLoading ? 'MEMPROSES...' : 'Bayar Sekarang',
                     );
                   },
                 );
