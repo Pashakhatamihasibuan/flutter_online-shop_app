@@ -13,6 +13,8 @@ import '../../../core/components/buttons.dart';
 import '../../../core/components/custom_dropdown.dart';
 import '../../../core/components/custom_text_field.dart';
 import '../../../core/components/spaces.dart';
+// Import SearchableDropdown component
+import '../../../core/components/searchable_dropdown.dart'; // Adjust path as needed
 
 class AddAddressPage extends StatefulWidget {
   const AddAddressPage({super.key});
@@ -90,7 +92,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
             ),
             const SpaceHeight(24),
 
-            /// Provinsi
+            /// Provinsi - Using SearchableDropdown
             BlocBuilder<ProvinceBloc, ProvinceState>(
               builder: (context, state) {
                 switch (state) {
@@ -99,11 +101,14 @@ class _AddAddressPageState extends State<AddAddressPage> {
                   case ProvinceLoading():
                     return const Center(child: CircularProgressIndicator());
                   case ProvinceLoaded(provinces: final provinces):
-                    return CustomDropdown<Province>(
+                    return SearchableDropdown<Province>(
                       value: selectedProvince,
                       label: 'Provinsi',
                       items: provinces,
                       itemBuilder: (item) => item.province ?? '-',
+                      searchBuilder: (item) =>
+                          item.province ?? '-', // For better search
+                      hintText: 'Cari provinsi...',
                       onChanged: (value) {
                         setState(() {
                           selectedProvince = value;
@@ -112,7 +117,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         });
                         if (value != null) {
                           context.read<CityBloc>().add(
-                                GetCity(value.provinceId ?? ''),
+                                CityEvent.getByProvinceId(
+                                    value.provinceId ?? ''),
                               );
                         }
                       },
@@ -130,7 +136,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
             const SpaceHeight(24),
 
-            /// Kota/Kabupaten
+            /// Kota/Kabupaten - You can also make this searchable
             BlocBuilder<CityBloc, CityState>(
               builder: (context, state) {
                 switch (state) {
@@ -139,6 +145,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                   case CityLoading():
                     return const Center(child: CircularProgressIndicator());
                   case CityLoaded(cities: final cities):
+                    // Option 1: Keep as regular dropdown
                     return CustomDropdown<City>(
                       value: selectedCity,
                       label: 'Kota/Kabupaten',
@@ -151,6 +158,22 @@ class _AddAddressPageState extends State<AddAddressPage> {
                         });
                       },
                     );
+
+                  // Option 2: Make it searchable too (uncomment to use)
+                  // return SearchableDropdown<City>(
+                  //   value: selectedCity,
+                  //   label: 'Kota/Kabupaten',
+                  //   items: cities,
+                  //   itemBuilder: (item) => item.cityName ?? '-',
+                  //   searchBuilder: (item) => item.cityName ?? '-',
+                  //   hintText: 'Cari kota/kabupaten...',
+                  //   onChanged: (value) {
+                  //     setState(() {
+                  //       selectedCity = value;
+                  //       // selectedDistrict = null;
+                  //     });
+                  //   },
+                  // );
                   case CityError(message: final message):
                     return Text(
                       'Gagal memuat kota: $message',

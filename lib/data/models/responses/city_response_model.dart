@@ -41,7 +41,10 @@ class Rajaongkir {
   String toJson() => json.encode(toMap());
 
   factory Rajaongkir.fromMap(Map<String, dynamic> json) => Rajaongkir(
-        query: json["query"] == null ? null : Query.fromMap(json["query"]),
+        // Fix: Handle query field that can be either Map or List
+        query: json["query"] == null || json["query"] is List
+            ? null
+            : Query.fromMap(json["query"]),
         status: json["status"] == null ? null : Status.fromMap(json["status"]),
         results: json["results"] == null
             ? []
@@ -99,6 +102,7 @@ class City {
   String toJson() => json.encode(toMap());
 
   factory City.fromMap(Map<String, dynamic> json) => City(
+        // The JSON already has string values, so no need to convert
         cityId: json["city_id"],
         provinceId: json["province_id"],
         province: json["province"],
