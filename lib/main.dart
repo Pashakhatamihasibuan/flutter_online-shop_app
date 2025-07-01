@@ -64,9 +64,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => StatusOrderBloc(OrderRemoteDatasource())),
 
         // Wilayah - RajaOngkir
-        BlocProvider(create: (_) => ProvinceBloc(rajaongkirDatasource)),
-        BlocProvider(create: (_) => CityBloc(rajaongkirDatasource)),
-        BlocProvider(create: (_) => CostBloc(rajaongkirDatasource)),
+        BlocProvider(create: (_) => ProvinceBloc()),
+        BlocProvider(create: (_) => CityBloc()),
+        BlocProvider(create: (_) => CostBloc()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

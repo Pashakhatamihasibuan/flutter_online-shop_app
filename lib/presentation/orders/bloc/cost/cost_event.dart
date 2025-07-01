@@ -1,3 +1,4 @@
+// Event classes
 part of 'cost_bloc.dart';
 
 @freezed

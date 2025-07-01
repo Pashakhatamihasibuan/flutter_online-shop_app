@@ -25,17 +25,13 @@ class CostResponseModel {
 }
 
 class Rajaongkir {
-  final Query? query;
+  final dynamic query; // Changed to dynamic to handle both Map and List
   final Status? status;
-  final NDetails? originDetails;
-  final NDetails? destinationDetails;
-  final List<Result>? results;
+  final List<CostResult>? results;
 
   Rajaongkir({
     this.query,
     this.status,
-    this.originDetails,
-    this.destinationDetails,
     this.results,
   });
 
@@ -45,124 +41,45 @@ class Rajaongkir {
   String toJson() => json.encode(toMap());
 
   factory Rajaongkir.fromMap(Map<String, dynamic> json) => Rajaongkir(
-        query: json["query"] == null ? null : Query.fromMap(json["query"]),
+        query: json["query"], // Keep as dynamic
         status: json["status"] == null ? null : Status.fromMap(json["status"]),
-        originDetails: json["origin_details"] == null
-            ? null
-            : NDetails.fromMap(json["origin_details"]),
-        destinationDetails: json["destination_details"] == null
-            ? null
-            : NDetails.fromMap(json["destination_details"]),
         results: json["results"] == null
             ? []
-            : List<Result>.from(json["results"]!.map((x) => Result.fromMap(x))),
+            : List<CostResult>.from(
+                json["results"]!.map((x) => CostResult.fromMap(x))),
       );
 
   Map<String, dynamic> toMap() => {
-        "query": query?.toMap(),
+        "query": query,
         "status": status?.toMap(),
-        "origin_details": originDetails?.toMap(),
-        "destination_details": destinationDetails?.toMap(),
         "results": results == null
             ? []
             : List<dynamic>.from(results!.map((x) => x.toMap())),
       };
 }
 
-class NDetails {
-  final String? cityId;
-  final String? provinceId;
-  final String? province;
-  final String? type;
-  final String? cityName;
-  final String? postalCode;
-
-  NDetails({
-    this.cityId,
-    this.provinceId,
-    this.province,
-    this.type,
-    this.cityName,
-    this.postalCode,
-  });
-
-  factory NDetails.fromJson(String str) => NDetails.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory NDetails.fromMap(Map<String, dynamic> json) => NDetails(
-        cityId: json["city_id"],
-        provinceId: json["province_id"],
-        province: json["province"],
-        type: json["type"],
-        cityName: json["city_name"],
-        postalCode: json["postal_code"],
-      );
-
-  Map<String, dynamic> toMap() => {
-        "city_id": cityId,
-        "province_id": provinceId,
-        "province": province,
-        "type": type,
-        "city_name": cityName,
-        "postal_code": postalCode,
-      };
-}
-
-class Query {
-  final String? origin;
-  final String? destination;
-  final int? weight;
-  final String? courier;
-
-  Query({
-    this.origin,
-    this.destination,
-    this.weight,
-    this.courier,
-  });
-
-  factory Query.fromJson(String str) => Query.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Query.fromMap(Map<String, dynamic> json) => Query(
-        origin: json["origin"],
-        destination: json["destination"],
-        weight: json["weight"],
-        courier: json["courier"],
-      );
-
-  Map<String, dynamic> toMap() => {
-        "origin": origin,
-        "destination": destination,
-        "weight": weight,
-        "courier": courier,
-      };
-}
-
-class Result {
+class CostResult {
   final String? code;
   final String? name;
-  final List<ResultCost>? costs;
+  final List<Cost>? costs;
 
-  Result({
+  CostResult({
     this.code,
     this.name,
     this.costs,
   });
 
-  factory Result.fromJson(String str) => Result.fromMap(json.decode(str));
+  factory CostResult.fromJson(String str) =>
+      CostResult.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory Result.fromMap(Map<String, dynamic> json) => Result(
-        code: json["code"],
-        name: json["name"],
+  factory CostResult.fromMap(Map<String, dynamic> json) => CostResult(
+        code: json["code"]?.toString(),
+        name: json["name"]?.toString(),
         costs: json["costs"] == null
             ? []
-            : List<ResultCost>.from(
-                json["costs"]!.map((x) => ResultCost.fromMap(x))),
+            : List<Cost>.from(json["costs"]!.map((x) => Cost.fromMap(x))),
       );
 
   Map<String, dynamic> toMap() => {
@@ -174,29 +91,28 @@ class Result {
       };
 }
 
-class ResultCost {
+class Cost {
   final String? service;
   final String? description;
-  final List<CostCost>? cost;
+  final List<CostDetail>? cost;
 
-  ResultCost({
+  Cost({
     this.service,
     this.description,
     this.cost,
   });
 
-  factory ResultCost.fromJson(String str) =>
-      ResultCost.fromMap(json.decode(str));
+  factory Cost.fromJson(String str) => Cost.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory ResultCost.fromMap(Map<String, dynamic> json) => ResultCost(
-        service: json["service"],
-        description: json["description"],
+  factory Cost.fromMap(Map<String, dynamic> json) => Cost(
+        service: json["service"]?.toString(),
+        description: json["description"]?.toString(),
         cost: json["cost"] == null
             ? []
-            : List<CostCost>.from(
-                json["cost"]!.map((x) => CostCost.fromMap(x))),
+            : List<CostDetail>.from(
+                json["cost"]!.map((x) => CostDetail.fromMap(x))),
       );
 
   Map<String, dynamic> toMap() => {
@@ -207,25 +123,28 @@ class ResultCost {
       };
 }
 
-class CostCost {
+class CostDetail {
   final int? value;
   final String? etd;
   final String? note;
 
-  CostCost({
+  CostDetail({
     this.value,
     this.etd,
     this.note,
   });
 
-  factory CostCost.fromJson(String str) => CostCost.fromMap(json.decode(str));
+  factory CostDetail.fromJson(String str) =>
+      CostDetail.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CostCost.fromMap(Map<String, dynamic> json) => CostCost(
-        value: json["value"],
-        etd: json["etd"],
-        note: json["note"],
+  factory CostDetail.fromMap(Map<String, dynamic> json) => CostDetail(
+        value: json["value"] is String
+            ? int.tryParse(json["value"])
+            : json["value"]?.toInt(),
+        etd: json["etd"]?.toString(),
+        note: json["note"]?.toString(),
       );
 
   Map<String, dynamic> toMap() => {
@@ -249,8 +168,10 @@ class Status {
   String toJson() => json.encode(toMap());
 
   factory Status.fromMap(Map<String, dynamic> json) => Status(
-        code: json["code"],
-        description: json["description"],
+        code: json["code"] is String
+            ? int.tryParse(json["code"])
+            : json["code"]?.toInt(),
+        description: json["description"]?.toString(),
       );
 
   Map<String, dynamic> toMap() => {

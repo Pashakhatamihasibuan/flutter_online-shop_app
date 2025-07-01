@@ -245,9 +245,28 @@ class _SelectShipping extends StatelessWidget {
                 BlocBuilder<CostBloc, CostState>(
                   builder: (context, state) {
                     if (state is CostLoaded) {
-                      final costs = state.costResponseModel.rajaongkir?.results
-                              ?.firstOrNull?.costs ??
-                          [];
+                      // IMPROVED: Better error handling for nested data
+                      final costs = _extractCosts(state.costResponseModel);
+
+                      if (costs.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                Icon(Icons.local_shipping,
+                                    size: 48, color: Colors.grey),
+                                SizedBox(height: 8),
+                                Text('Tidak ada layanan pengiriman tersedia'),
+                                Text('Silakan coba lagi nanti',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       return Container(
                         constraints: BoxConstraints(
                           maxHeight: MediaQuery.of(context).size.height * 0.6,
@@ -256,41 +275,8 @@ class _SelectShipping extends StatelessWidget {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = costs[index];
-                            final costValue = item.cost?.firstOrNull?.value;
-                            final etd = item.cost?.firstOrNull?.etd ?? '-';
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              onTap: () {
-                                if (costValue != null) {
-                                  onSelected(ShippingModel(
-                                    type:
-                                        '${item.service ?? ''} (${item.description ?? ''})',
-                                    priceStart: costValue,
-                                    priceEnd: costValue,
-                                    estimate: DateTime.now().add(
-                                      Duration(
-                                          days: int.tryParse(
-                                                  etd.split(' ').first) ??
-                                              3),
-                                    ),
-                                  ));
-                                  context.pop();
-                                }
-                              },
-                              title: Text(
-                                '${item.description ?? item.service ?? 'Layanan'} '
-                                '(${(costValue ?? 0).toRupiah})',
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              subtitle: Text(
-                                'Estimasi tiba $etd Hari',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              trailing: const Icon(
-                                Icons.chevron_right,
-                                color: AppColors.primary,
-                              ),
-                            );
+                            return _buildShippingOption(
+                                item, onSelected, context);
                           },
                           separatorBuilder: (context, index) =>
                               const Divider(color: AppColors.stroke),
@@ -302,12 +288,38 @@ class _SelectShipping extends StatelessWidget {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(20.0),
-                          child: CircularProgressIndicator(),
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 8),
+                              Text('Memuat tarif pengiriman...'),
+                            ],
+                          ),
                         ),
                       );
                     }
                     if (state is CostError) {
-                      return Center(child: Text(state.message));
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.error_outline,
+                                  size: 48, color: Colors.red),
+                              const SizedBox(height: 8),
+                              Text('Error: ${state.message}'),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Retry logic - you can add retry functionality here
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Tutup'),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
                     }
                     return const Center(
                       child: Padding(
@@ -350,6 +362,101 @@ class _SelectShipping extends StatelessWidget {
       ),
     );
   }
+
+  // Helper method to safely extract costs from response
+  List<ShippingOption> _extractCosts(dynamic costResponseModel) {
+    try {
+      final results = costResponseModel?.rajaongkir?.results;
+      if (results == null || results.isEmpty) return [];
+
+      final List<ShippingOption> allCosts = [];
+
+      for (final result in results) {
+        final costs = result?.costs;
+        if (costs != null && costs.isNotEmpty) {
+          for (final cost in costs) {
+            final costDetails = cost?.cost;
+            if (costDetails != null && costDetails.isNotEmpty) {
+              for (final detail in costDetails) {
+                if (detail?.value != null) {
+                  allCosts.add(ShippingOption(
+                    service: cost?.service ?? 'Layanan',
+                    description: cost?.description ?? '',
+                    value: detail!.value!,
+                    etd: detail.etd ?? '1-3',
+                    courierName: result?.name ?? 'Kurir',
+                  ));
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return allCosts;
+    } catch (e) {
+      debugPrint('Error extracting costs: $e');
+      return [];
+    }
+  }
+
+  Widget _buildShippingOption(ShippingOption option,
+      Function(ShippingModel) onSelected, BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      onTap: () {
+        onSelected(ShippingModel(
+          type: '${option.service} (${option.description})',
+          priceStart: option.value,
+          priceEnd: option.value,
+          estimate: DateTime.now().add(
+            Duration(days: _parseEtd(option.etd)),
+          ),
+        ));
+        context.pop();
+      },
+      title: Text(
+        '${option.description.isNotEmpty ? option.description : option.service} '
+        '(${option.value.toRupiah})',
+        style: const TextStyle(fontSize: 14),
+      ),
+      subtitle: Text(
+        'Estimasi tiba ${option.etd} Hari - ${option.courierName}',
+        style: const TextStyle(fontSize: 12),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: AppColors.primary,
+      ),
+    );
+  }
+
+  int _parseEtd(String etd) {
+    try {
+      // Handle various ETD formats like "1-3", "2", "1-2 HARI", etc.
+      final match = RegExp(r'\d+').firstMatch(etd);
+      return match != null ? int.parse(match.group(0)!) : 3;
+    } catch (e) {
+      return 3; // Default fallback
+    }
+  }
+}
+
+// Helper class for shipping options
+class ShippingOption {
+  final String service;
+  final String description;
+  final int value;
+  final String etd;
+  final String courierName;
+
+  ShippingOption({
+    required this.service,
+    required this.description,
+    required this.value,
+    required this.etd,
+    required this.courierName,
+  });
 }
 
 Widget _buildBadgeCart(BuildContext context, int quantity) {
